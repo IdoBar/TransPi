@@ -275,27 +275,27 @@ def hasExtension(it, extension) {
 def checkArgs() {
     if (!params.k) {
         println("\n\t\033[0;31mKmer list not specified.\n\tFor more info use `nextflow run TransPi.nf --help`\n\033[0m")
-        exit 0
+        exit 1
     }
     if (!params.reads && !params.readsTest) {
         println("\n\t\033[0;31mReads mandatory argument not specified.\n\tFor more info use `nextflow run TransPi.nf --help`\n\033[0m")
-        exit 0
+        exit 1
     }
     if (!params.maxReadLen) {
         println("\n\t\033[0;31mMax read length argument not specified.\n\tFor more info use `nextflow run TransPi.nf --help`\n\033[0m")
-        exit 0
+        exit 1
     }
 }
 
 if ((params.condaActivate && params.myConda) && (params.myCondaInstall == "" || params.cenv == "")) {
     println("\n\t\033[0;31mNeed to specify the local conda installation in parameter \"myCondaInstall\" and \"cenv\" in the config file.\n\tFor more info use `nextflow run TransPi.nf --help`\n\033[0m")
-    exit 0
+    exit 1
 }
 
 if (params.rRNAfilter) {
     if (params.rRNAdb == "" || params.rRNAdb == true) {
         println("\n\t\033[0;31mNeed to provide the PATH to the rRNA database.\n\tFor more info use `nextflow run TransPi.nf --help`\n\033[0m")
-        exit 0
+        exit 1
     }
 }
 
@@ -481,8 +481,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 script:
                     """
                     echo ${sample_id}
-                    bash get_readstats.sh ${json}
-                    bash get_readqual.sh ${json}
+                    bash ${params.pipeInstall}/bin/get_readstats.sh ${json}
+                    bash ${params.pipeInstall}/bin/get_readqual.sh ${json}
                     """
 
             }
@@ -1589,7 +1589,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 script:
                     """
                     cat $transpi_tsv | grep -v "#" | tr "\\t" "," >>$all_busco
-                    SOS_busco.py -input_file_busco $all_busco -input_file_fasta $assembly -min ${params.minPerc} -kmers ${params.k}
+                    ${params.pipeInstall}/bin/SOS_busco.py -input_file_busco $all_busco -input_file_fasta $assembly -min ${params.minPerc} -kmers ${params.k}
                     mv Complete_comparison_table ${sample_id}_complete_BUSCO4_table.tsv
                     mv TransPi_comparison_table ${sample_id}_TransPi_missing_BUSCO4_table.tsv
                     if [ -e sequences_to_add.fasta ];then
@@ -1672,7 +1672,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 set +e
                 tri=\$( echo $files | tr " " "\\n" | grep ".Trinity.bus4.txt" )
                 trans=\$( echo $files | tr " " "\\n" | grep ".TransPi.bus4.txt" )
-                bash get_busco_val.sh \${tri} \${trans} v4 ${sample_id}
+                bash ${params.pipeInstall}/bin/get_busco_val.sh \${tri} \${trans} v4 ${sample_id}
                 cp ${params.pipeInstall}/bin/busco_comparison.R .
                 a=\$( cat final_spec )
                 sed -i "s/MYSPEC/\${a}/" busco_comparison.R
@@ -1824,38 +1824,28 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 publishDir "${params.outdir}/transdecoder", mode: "copy", overwrite: true
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
-                if (params.oneContainer){ container "${params.TPcontainer}" } else {
+                if (params.oneContainer){ container "${params.diamondcontainer}" } else {
                 container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
                 }
-
+               
                 input:
-                    tuple sample_id, file(pep) from transdecoder_diamond
+                    tuple sample_id, file(pep) from transdecoder_diamond 
 
                 output:
                     tuple sample_id, file("${sample_id}.diamond_blastp.outfmt6") into transdecoder_predict_diamond
 
                 script:
                     """
-                    dbPATH=${params.pipeInstall}/DBs/uniprot_db/
+                    # dbPATH=${params.pipeInstall}/DBs/uniprot_db/
+                    dbPATH=\$(dirname ${params.uniprot})
                     echo -e "\\n-- Starting Diamond (blastp) --\\n"
-                    if [ ! -d \${dbPATH} ];then
-                        echo "Directory \${dbPATH} not found. Run the precheck to fix this issue"
-                        exit 0
-                    elif [ -d \${dbPATH} ];then
-                        if [ ! -e \${dbPATH}/${params.uniname} ];then
-                            echo "File \${dbPATH}/${params.uniname} not found. Run the precheck to fix this issue"
-                            exit 0
-                        elif [ -e \${dbPATH}/${params.uniname} ];then
-                            if [ ! -e \${dbPATH}/${params.uniname}.dmnd ];then
-                                cp \${dbPATH}/${params.uniname} .
-                                diamond makedb --in ${params.uniname} -d ${params.uniname} -p ${task.cpus}
-                                diamond blastp -d ${params.uniname}.dmnd -q ${pep} -p ${task.cpus} -f 6 -k 1 -e 0.00001 >${sample_id}.diamond_blastp.outfmt6
-                            elif [ -e \${dbPATH}/${params.uniname}.dmnd ];then
-                                cp \${dbPATH}/${params.uniname}.dmnd .
-                                diamond blastp -d ${params.uniname}.dmnd -q ${pep} -p ${task.cpus} -f 6 -k 1 -e 0.00001 >${sample_id}.diamond_blastp.outfmt6
-                            fi
+                        if [ ! -e \${dbPATH}/${params.uniname}.dmnd ];then
+                            # cp \${dbPATH}/${params.uniname} .
+                            diamond makedb --in ${params.uniprot} -d \${dbPATH}/${params.uniname} -p ${task.cpus}
                         fi
-                    fi
+                    diamond blastp -d \${dbPATH}/${params.uniname}.dmnd -q ${pep} -p ${task.cpus} -f 6 -k 1 -e 0.00001 > ${sample_id}.diamond_blastp.outfmt6
+                            
+                        
                     echo -e "\\n-- Done with Diamond (blastp) --\\n"
                     """
             }
@@ -1885,11 +1875,11 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     echo -e "\\n-- Starting HMMER --\\n"
                     if [ ! -d \${dbPATH} ];then
                         echo "Directory \${dbPATH} not found. Run the precheck to fix this issue"
-                        exit 0
+                        exit 1
                     elif [ -d \${dbPATH} ];then
                         if [ ! -e \${dbPATH}/${params.pfname} ];then
                             echo "File \${dbPATH}/${params.pfname} not found. Run the precheck to fix this issue"
-                            exit 0
+                            exit 1
                         elif [ -e \${dbPATH}/${params.pfname} ];then
                             if [ ! -e \${dbPATH}/${params.pfname}.h3f ] && [ ! -e \${dbPATH}/${params.pfname}.h3i ] && [ ! -e \${dbPATH}/${params.pfname}.h3m ] && [ ! -e \${dbPATH}/${params.pfname}.h3p ];then
                                 cp \${dbPATH}/${params.pfname} .
@@ -2005,7 +1995,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
             publishDir "${workDir}/.versions", mode: "copy", overwrite: true, pattern: "*.version.txt"
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
-            if (params.oneContainer){ container "${params.TPcontainer}" } else {
+            if (params.oneContainer){ container "${params.diamondcontainer}" } else {
             container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
             }
 
@@ -2023,30 +2013,23 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 echo -e "\\n-- Starting Diamond --\\n"
                 if [ ! -d \${dbPATH} ];then
                     echo "Directory \${dbPATH} not found. Run the precheck to fix this issue"
-                    exit 0
+                    exit 1
                 elif [ -d \${dbPATH} ];then
                     if [ ! -e \${dbPATH}/uniprot_sprot.pep ];then
                         echo "File \${dbPATH}/uniprot_sprot.pep not found. Run the precheck to fix this issue"
-                        exit 0
+                        exit 1
                     elif [ -e \${dbPATH}/uniprot_sprot.pep ];then
                         if [ ! -e \${dbPATH}/uniprot_sprot.pep.dmnd ];then
-                            cp \${dbPATH}/uniprot_sprot.pep .
-                            diamond makedb --in uniprot_sprot.pep -d uniprot_sprot.pep -p ${task.cpus}
-                            echo -e "\\n-- Starting with Diamond (blastx) --\\n"
-                            diamond blastx -d uniprot_sprot.pep.dmnd -q ${assembly} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.diamond_blastx.outfmt6
-                            echo -e "\\n-- Done with Diamond (blastx) --\\n"
-                            echo -e "\\n-- Starting with Diamond (blastp) --\\n"
-                            diamond blastp -d uniprot_sprot.pep.dmnd -q ${transdecoder} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.diamond_blastp.outfmt6
-                            echo -e "\\n-- Done with Diamond (blastp)  --\\n"
-                        elif [ -e \${dbPATH}/uniprot_sprot.pep.dmnd ];then
-                            cp \${dbPATH}/uniprot_sprot.pep.dmnd .
-                            echo -e "\\n-- Starting with Diamond (blastx) --\\n"
-                            diamond blastx -d uniprot_sprot.pep.dmnd -q ${assembly} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.diamond_blastx.outfmt6
-                            echo -e "\\n-- Done with Diamond (blastx) --\\n"
-                            echo -e "\\n-- Starting with Diamond (blastp) --\\n"
-                            diamond blastp -d uniprot_sprot.pep.dmnd -q ${transdecoder} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.diamond_blastp.outfmt6
-                            echo -e "\\n-- Done with Diamond (blastp)  --\\n"
+                            #cp \${dbPATH}/uniprot_sprot.pep .
+                            diamond makedb --in \${dbPATH}/uniprot_sprot.pep -d \${dbPATH}/uniprot_sprot.pep -p ${task.cpus}
                         fi
+                        echo -e "\\n-- Starting with Diamond (blastx) --\\n"
+                        diamond blastx -d \${dbPATH}/uniprot_sprot.pep.dmnd -q ${assembly} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.diamond_blastx.outfmt6
+                        echo -e "\\n-- Done with Diamond (blastx) --\\n"
+                        echo -e "\\n-- Starting with Diamond (blastp) --\\n"
+                        diamond blastp -d \${dbPATH}/uniprot_sprot.pep.dmnd -q ${transdecoder} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.diamond_blastp.outfmt6
+                        echo -e "\\n-- Done with Diamond (blastp)  --\\n"
+                      
                     fi
                 fi
                 echo -e "\\n-- Done with Diamond --\\n"
@@ -2063,7 +2046,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
             tag "${sample_id}"
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
-            if (params.oneContainer){ container "${params.TPcontainer}" } else {
+            if (params.oneContainer){ container "${params.diamondcontainer}" } else {
             container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
             }
 
@@ -2075,37 +2058,20 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 tuple sample_id, file("${sample_id}.custom.diamond_blastp.outfmt6") into trinotate_ch_diamondP_custom
 
             script:
-                """
-                dbPATH=${params.pipeInstall}/DBs/uniprot_db/
-                echo -e "\\n-- Starting Diamond --\\n"
-                if [ ! -d \${dbPATH} ];then
-                    echo "Directory \${dbPATH} not found. Run the precheck to fix this issue"
-                    exit 0
-                elif [ -d \${dbPATH} ];then
-                    if [ ! -e \${dbPATH}/${params.uniname} ];then
-                        echo "File \${dbPATH}/${params.uniname} not found. Run the precheck to fix this issue"
-                        exit 0
-                    elif [ -e \${dbPATH}/${params.uniname} ];then
+                """                
+                dbPATH=\$(dirname ${params.uniprot})
+                    echo -e "\\n-- Starting Diamond (blastp) --\\n"
                         if [ ! -e \${dbPATH}/${params.uniname}.dmnd ];then
-                            cp \${dbPATH}/${params.uniname} .
-                            diamond makedb --in ${params.uniname} -d ${params.uniname} -p ${task.cpus}
-                            echo -e "\\n-- Starting with Diamond (blastx) --\\n"
-                            diamond blastx -d ${params.uniname}.dmnd -q ${assembly} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.custom.diamond_blastx.outfmt6
-                            echo -e "\\n-- Done with Diamond (blastx) --\\n"
-                            echo -e "\\n-- Starting with Diamond (blastp) --\\n"
-                            diamond blastp -d ${params.uniname}.dmnd -q ${transdecoder} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.custom.diamond_blastp.outfmt6
-                            echo -e "\\n-- Done with Diamond (blastp)  --\\n"
-                        elif [ -e \${dbPATH}/${params.uniname}.dmnd ];then
-                            cp \${dbPATH}/${params.uniname}.dmnd .
-                            echo -e "\\n-- Starting with Diamond (blastx) --\\n"
-                            diamond blastx -d ${params.uniname}.dmnd -q ${assembly} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.custom.diamond_blastx.outfmt6
-                            echo -e "\\n-- Done with Diamond (blastx) --\\n"
-                            echo -e "\\n-- Starting with Diamond (blastp) --\\n"
-                            diamond blastp -d ${params.uniname}.dmnd -q ${transdecoder} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.custom.diamond_blastp.outfmt6
-                            echo -e "\\n-- Done with Diamond (blastp)  --\\n"
+                                # cp \${dbPATH}/${params.uniname} .
+                            diamond makedb --in ${params.uniprot} -d \${dbPATH}/${params.uniname} -p ${task.cpus}
                         fi
-                    fi
-                fi
+                    echo -e "\\n-- Starting with Diamond (blastx) --\\n"
+                    diamond blastx -d  \${dbPATH}/${params.uniname}.dmnd -q ${assembly} -p ${task.cpus} -f 6 -k 1 -e 0.001 > ${sample_id}.custom.diamond_blastx.outfmt6
+                    echo -e "\\n-- Done with Diamond (blastx) --\\n"
+                    echo -e "\\n-- Starting with Diamond (blastp) --\\n"
+                    diamond blastp -d  \${dbPATH}/${params.uniname}.dmnd -q ${transdecoder} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.custom.diamond_blastp.outfmt6
+                    echo -e "\\n-- Done with Diamond (blastp)  --\\n"
+                
                 echo -e "\\n-- Done with Diamond --\\n"
                 """
         }
@@ -2136,11 +2102,11 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 echo -e "\\n-- Starting HMMER --\\n"
                 if [ ! -d \${dbPATH} ];then
                     echo "Directory \${dbPATH} not found. Run the precheck to fix this issue"
-                    exit 0
+                    exit 1
                 elif [ -d \${dbPATH} ];then
                     if [ ! -e \${dbPATH}/${params.pfname} ];then
                         echo "File \${dbPATH}/${params.pfname} not found. Run the precheck to fix this issue"
-                        exit 0
+                        exit 1
                     elif [ -e \${dbPATH}/${params.pfname} ];then
                         if [ ! -e \${dbPATH}/${params.pfname}.h3f ] && [ ! -e \${dbPATH}/${params.pfname}.h3i ] && [ ! -e \${dbPATH}/${params.pfname}.h3m ] && [ ! -e \${dbPATH}/${params.pfname}.h3p ];then
                             cp \${dbPATH}/${params.pfname} .
@@ -2265,19 +2231,24 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 output:
                     tuple sample_id, file("${sample_id}.rnammer.gff") into trinotate_ch_rnammer
 
-                script:
-                    """
+                shell:
+                    '''
                     set +e
+                    # Fix path of rnammer utilities bin
+                    ln -s /opt/conda/envs/TransPi/bin/superScaffoldGenerator.pl ./
+                    ln -s /opt/conda/envs/TransPi/bin/rnammer_supperscaffold_gff_to_indiv_transcripts.pl ./
+                    sed 's|\$FindBin::RealBin/util|.|g' /opt/conda/envs/TransPi/bin/RnammerTranscriptome.pl > ./RnammerTranscriptome.pl
+                    
                     #RNAMMER to identify rRNA transcripts
 
                     echo -e "\\n-- Starting with RNAMMER --\\n"
+                    
+                    perl ./RnammerTranscriptome.pl --transcriptome !{transcriptome} --path_to_rnammer !{params.rnam}
 
-                    RnammerTranscriptome.pl --transcriptome ${transcriptome} --path_to_rnammer ${params.rnam}
-
-                    mv ${sample_id}.combined.okay.fa.rnammer.gff ${sample_id}.rnammer.gff
+                    mv !{sample_id}.combined.okay.fa.rnammer.gff !{sample_id}.rnammer.gff
 
                     echo -e "\\n-- Done with RNAMMER --\\n"
-                    """
+                    '''
             }
         } else {
 
@@ -2617,7 +2588,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             script:
                 """
-                len.py ${dist} >all_transcript_sizes.txt
+                ${params.pipeInstall}/bin/len.py ${dist} >all_transcript_sizes.txt
                 mv all_transcript_sizes.txt ${sample_id}_sizes.txt
 
                 v=\$( python --version | cut -f 2 -d " " )
@@ -2802,7 +2773,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     tag "${sample_id}"
 
                     conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
-                    if (params.oneContainer){ container "${params.TPcontainer}" } else {
+                    if (params.oneContainer){ container "${params.diamondcontainer}" } else {
                     container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
                     }
 
@@ -2856,7 +2827,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             } else {
                 println("\n\t\033[0;31mNeed to provide a host and symbiont sequence.\n\tFor more info use `nextflow run TransPi.nf --help`\n\033[0m")
-                exit 0
+                exit 1
             }
         }
     }
@@ -2989,7 +2960,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
 } else {
     println("\n\t\033[0;31mMandatory argument not specified.\n\tFor more info use `nextflow run TransPi.nf --help`\n\033[0m")
-    exit 0
+    exit 1
 }
 
 workflow.onComplete {

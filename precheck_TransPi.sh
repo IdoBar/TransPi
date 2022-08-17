@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash 
+set -eo pipefail
 export mypwd="$1"
 os_c() {
     OS="$(uname)"
@@ -7,7 +8,7 @@ os_c() {
         curl -o Anaconda3-2020.11-Linux-x86_64.sh https://repo.anaconda.com/archive/Anaconda3-2020.11-Linux-x86_64.sh
     else
         echo -e "\n\t\e[31m -- ERROR: Are you in a Linux system? Please check requirements and rerun the pre-check --\e[39m\n"
-        exit 0
+        exit 1
     fi
 }
 source_c() {
@@ -62,7 +63,7 @@ conda_c() {
                     conda env create -f ${confDir}/transpi_env.yml
                 else
                     echo -e "\n\t\e[31m -- ERROR: TransPi environment file not found (transpi_env.yml). Please run the precheck in the TransPi directory. See manual for more info --\e[39m\n"
-                    exit 0
+                    exit 1
                 fi
             elif [ "$check_env" -eq 1 ];then
                 echo -e "\n\t -- TransPi environment is installed and ready to be used --\n"
@@ -81,7 +82,7 @@ conda_c() {
             conda env create -f ${confDir}/transpi_env.yml
         else
             echo -e "\n\t\e[31m -- ERROR: TransPi environment file not found (transpi_env.yml). Please run the precheck in the TransPi directory. See manual for more info --\e[39m\n"
-            exit 0
+            exit 1
         fi
     fi
 }
@@ -327,7 +328,7 @@ bus_c () {
     done
     else
         echo -e "\n\t\e[31m -- ERROR: Please make sure that file \"busV4list.txt\" is available. Please run the precheck in the TransPi directory. See manual for more info --\e[39m\n\n"
-	    exit 0
+	    exit 1
     fi
 }
 uni_c () {
@@ -362,7 +363,7 @@ unicomp_c () {
         ;;
         [nN] | [nN][oO])
             echo -e "\n\n\t\e[31m -- ERROR: Please uncompress the file(s) and rerun the pre-check  --\e[39m\n"
-            exit 0
+            exit 1
         ;;
         exit)
             echo -e "\n\t -- Exiting -- \n"
@@ -396,7 +397,8 @@ uniprot_taxon_DB(){
     echo -e -n "\n\t -- Your Taxon ID (only the numbers): "
     read ans
     echo -e "\n\t -- Downloading UNIPROT proteins from Taxon ID: $ans -- \n"
-    curl -o uniprot_${ans}.fasta.gz "https://www.uniprot.org/uniprot/?query=taxonomy:${ans}&format=fasta&compress=yes&include=no"
+    # curl -o uniprot_${ans}.fasta.gz "https://rest.uniprot.org/uniprotkb/stream?compressed=true&format=fasta&query=%28taxonomy_id%3A${ans}%29" 
+    curl -o uniprot_${ans}.fasta.gz "https://legacy.uniprot.org/uniprot/?query=taxonomy:${ans}&format=fasta&compress=yes&include=no"
     gunzip uniprot_${ans}.fasta.gz
     date -u >.lastrun.txt
     uni_c
@@ -422,7 +424,8 @@ uniprot_meta () {
         1)
             echo -e "\n\n\t -- Downloading current metazoan protein dataset from UNIPROT -- \n"
             echo -e "\n\t -- This could take a couple of minutes depending on connection. Please wait -- \n"
-            curl -o uniprot_metazoa_33208.fasta.gz "https://www.uniprot.org/uniprot/?query=taxonomy:33208&format=fasta&compress=yes&include=no"
+            # curl -o uniprot_metazoa_33208.fasta.gz "https://rest.uniprot.org/uniprotkb/stream?compressed=true&format=fasta&query=%28taxonomy_id%3A33208%29"
+            curl -o uniprot_metazoa_33208.fasta.gz "https://legacy.uniprot.org/uniprot/?query=taxonomy:33208&format=fasta&compress=yes&include=no"
             echo -e "\n\t -- Uncompressing uniprot_metazoa_33208.fasta.gz ... -- \n"
             gunzip uniprot_metazoa_33208.fasta.gz
             date -u >.lastrun.txt
@@ -471,7 +474,7 @@ java_c () {
 	check_err=$( head -n 1 .error_nextflow | grep -c "java: command not found" )
 	if [ $check_err -eq 1 ];then
 		echo -e "\n\t\e[31m -- ERROR: Please install Java 1.8 (or later). Requirement for Nextflow --\e[39m\n"
-		exit 0
+		exit 1
 	fi
 	rm .error_nextflow
 }
@@ -496,7 +499,7 @@ nextflow_c () {
                 ;;
                 [nN] | [nN][oO])
                     echo -e "\n\n\t\e[31m -- ERROR: Download and Install Nextflow. Then rerun the pre-check  --\e[39m\n"
-                    exit 0
+                    exit 1
                 ;;
                 *)
                     echo -e "\n\n\t\e[31m -- Yes or No answer not specified. Try again --\e[39m\n"
@@ -566,7 +569,7 @@ trisql_c () {
     check_conda=$( command -v conda )
     if [ "$check_conda" == "" ];then
         echo -e "\n\t\e[31m -- Looks like conda is not installed--\e[39m\n"
-        exit 0
+        exit 1
     fi
     if [ ! -e *.sqlite ];then
         echo -e "\n\t -- Custom sqlite database for Trinotate is not installed -- \n"
@@ -579,7 +582,7 @@ trisql_c () {
             if [ $check_sql -eq 0 ];then
                 echo -e "\n\t -- Script \"Build_Trinotate_Boilerplate_SQLite_db.pl\" from Trinotate cannot be found -- \n"
                 echo -e "\n\t\e[31m -- Verify your conda installation --\e[39m\n"
-                exit 0
+                exit 1
             elif [ $check_sql -eq 1 ];then
                 Build_Trinotate_Boilerplate_SQLite_db.pl Trinotate
                 rm uniprot_sprot.dat.gz Pfam-A.hmm.gz
@@ -650,7 +653,7 @@ sqld(){
     if [ "$check_conda" == "" ];then
         echo -e "\n\t\e[31m -- Looks like conda is not installed --\e[39m\n"
         echo -e "\n\t\e[31m -- Install conda and rerun this script --\e[39m\n"
-        exit 0
+        exit 1
     fi
     if [ ! -e *.sqlite ];then
         echo -e "\n\t -- Custom sqlite database for Trinotate is not installed -- \n"
@@ -666,7 +669,7 @@ sqld(){
                     if [ $check_sql -eq 0 ];then
                         echo -e "\n\t -- Script \"Build_Trinotate_Boilerplate_SQLite_db.pl\" from Trinotate cannot be found -- \n"
                         echo -e "\n\t\e[31m -- Verify your conda installation --\e[39m\n"
-                        exit 0
+                        exit 1
                     elif [ $check_sql -eq 1 ];then
                         echo -e "\n\t -- This could take a couple of minutes depending on connection. Please wait -- \n"
                         Build_Trinotate_Boilerplate_SQLite_db.pl Trinotate
@@ -677,7 +680,7 @@ sqld(){
             ;;
             [nN] | [nN][oO])
                 echo -e "\n\n\t\e[31m -- ERROR: Generate the custom trinotate sqlite database at "${mypwd}/DBs/sqlite_db". Then rerun the pre-check  --\e[39m\n"
-                exit 0
+                exit 1
             ;;
             *)
                 echo -e "\n\n\t\e[31m -- Yes or No answer not specified. Try again --\e[39m\n"
@@ -720,7 +723,7 @@ ddate() {
             ;;
             [nN] | [nN][oO])
                 echo -e "\n\n\t -- Exiting program -- \n"
-                exit
+                exit 0
             ;;
             *)
                 echo -e "\n\n\t\e[31m -- Yes or No answer not specified. Try again --\e[39m\n"
@@ -1022,7 +1025,7 @@ main(){
             main
         else
             echo -e "\n\t -- Please provide a valid PATH to run TransPi -- \n"
-            exit 0
+            exit 1
         fi
     elif [ -d "$mypwd" ];then
         if [ ${mypwd} == "." ];then
