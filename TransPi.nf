@@ -2237,7 +2237,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     # Fix path of rnammer utilities bin
                     ln -s /opt/conda/envs/TransPi/bin/superScaffoldGenerator.pl ./
                     ln -s /opt/conda/envs/TransPi/bin/rnammer_supperscaffold_gff_to_indiv_transcripts.pl ./
-                    sed 's|\$FindBin::RealBin/util|.|g' /opt/conda/envs/TransPi/bin/RnammerTranscriptome.pl > ./RnammerTranscriptome.pl
+                    sed 's|\\$FindBin::RealBin/util|.|g' /opt/conda/envs/TransPi/bin/RnammerTranscriptome.pl > ./RnammerTranscriptome.pl
                     
                     #RNAMMER to identify rRNA transcripts
 
@@ -2245,7 +2245,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     
                     perl ./RnammerTranscriptome.pl --transcriptome !{transcriptome} --path_to_rnammer !{params.rnam}
 
-                    mv !{sample_id}.combined.okay.fa.rnammer.gff !{sample_id}.rnammer.gff
+                    # mv !{sample_id}.combined.okay.fa.rnammer.gff !{sample_id}.rnammer.gff
 
                     echo -e "\\n-- Done with RNAMMER --\\n"
                     '''
@@ -2449,26 +2449,26 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     echo \${line} | cut -f 2,3,4 -d "#" | grep "GO:" | tr "#" "\\n" | tr "\\`" "\\n" | sed 's/\\. /,/g' | tr "," "\\n" | grep "GO:" | sort -u >>final_GOs.txt
                 done<all_GOs.txt
 
-                cat final_GOs.txt | tr [a-z] [A-Z] | grep "CELLULAR_COMPONENT" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed 's/^ *//g' \
-                | sed 's/\\([0-9] \\)/\\1#/g' | tr "#" "\\t" >GO_cellular.txt
+                # cat final_GOs.txt | tr [a-z] [A-Z] | grep "CELLULAR_COMPONENT" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed 's/^ *//g' \
+                # | sed 's/\([0-9] \)/\1#/g' | tr "#" "\t"  >GO_cellular.txt
+                cat final_GOs.txt | tr [a-z] [A-Z] | grep "CELLULAR_COMPONENT" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed -r 's/^\\s+//; s/^([0-9]+) /\\1,/' >GO_cellular.csv
+                cat final_GOs.txt | tr [a-z] [A-Z] | grep "BIOLOGICAL_PROCESS" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed -r 's/^\\s+//; s/^([0-9]+) /\\1,/' >GO_biological.csv
+                cat final_GOs.txt | tr [a-z] [A-Z] | grep "MOLECULAR_FUNCTION" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed -r 's/^\\s+//; s/^([0-9]+) /\\1,/' >GO_molecular.csv
 
-                cat final_GOs.txt | tr [a-z] [A-Z] | grep "BIOLOGICAL_PROCESS" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed 's/^ *//g' \
-                | sed 's/\\([0-9] \\)/\\1#/g' | tr "#" "\\t" >GO_biological.txt
 
-                cat final_GOs.txt | tr [a-z] [A-Z] | grep "MOLECULAR_FUNCTION" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed 's/^ *//g' \
-                | sed 's/\\([0-9] \\)/\\1#/g' | tr "#" "\\t" >GO_molecular.txt
+                # cat final_GOs.txt | tr [a-z] [A-Z] | grep "CELLULAR_COMPONENT" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed -r 's/^ *//g; \
+                # s/([0-9] )/\1#/g; s/\#/\t/g;  s/^[^0-9]*([0-9]+)/\1,/g' >GO_cellular.csv
+
+                # cat final_GOs.txt | tr [a-z] [A-Z] | grep "BIOLOGICAL_PROCESS" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed 's/^ *//g' \
+                # | sed 's/([0-9] )/\1#/g' | tr "#" "\t" | sed -r 's/^[^0-9]*([0-9]+)/\1,/g' > GO_biological.csv
+
+                # cat final_GOs.txt | tr [a-z] [A-Z] | grep "MOLECULAR_FUNCTION" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed 's/^ *//g' \
+                # | sed 's/([0-9] )/\1#/g' | tr "#" "\t" | sed -r 's/^[^0-9]*([0-9]+)/\1,/g' > GO_molecular.csv
+                # | sed 's/\\([0-9] \\)/\\1#/g' | tr "#" "\\t" | sed -r 's/^[^0-9]*([0-9]+)/\1,/g' > GO_molecular.csv
 
                 Rscript GO_plots.R ${sample_id}
 
                 rm all_GOs.txt final_GOs.txt
-
-                mv GO_cellular.txt ${sample_id}_GO_cellular.txt
-                mv GO_biological.txt ${sample_id}_GO_biological.txt
-                mv GO_molecular.txt ${sample_id}_GO_molecular.txt
-
-                cat ${sample_id}_GO_cellular.txt | sed -r 's/^[^0-9]*([0-9]+)/\\1,/g' >${sample_id}_GO_cellular.csv
-                cat ${sample_id}_GO_biological.txt | sed -r 's/^[^0-9]*([0-9]+)/\\1,/g' >${sample_id}_GO_biological.csv
-                cat ${sample_id}_GO_molecular.txt | sed -r 's/^[^0-9]*([0-9]+)/\\1,/g' >${sample_id}_GO_molecular.csv
 
                 v=\$( R --version | grep "R version" | awk '{print \$3}' )
                 echo "R: \$v" >r.version.txt

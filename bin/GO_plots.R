@@ -4,13 +4,26 @@ sample_name=args[1]
 library(ggthemes)
 library(ggplot2)
 
-dataCC=read.delim("GO_cellular.txt", header = F, sep = "\t")
-dataMF=read.delim("GO_molecular.txt", header = F, sep = "\t")
-dataBP=read.delim("GO_biological.txt", header = F, sep = "\t")
+dataCC=read.csv("GO_cellular.csv", header = F)
+dataCC$V2=trimws(gsub("\\s+", " ", dataCC$V2))
+write.table(dataCC, paste0(sample_name, "_GO_cellular.txt"), sep = "\t", row.names = FALSE, col.names = FALSE)
+write.table(dataCC, paste0(sample_name, "_GO_cellular.csv"), sep = ",", row.names = FALSE, col.names = FALSE)
+
+dataMF=read.csv("GO_molecular.csv", header = F)
+dataMF$V2=trimws(gsub("\\s+", " ", dataMF$V2))
+write.table(dataMF, paste0(sample_name, "_GO_molecular.txt"), sep = "\t", row.names = FALSE, col.names = FALSE)
+write.table(dataMF, paste0(sample_name, "_GO_molecular.csv"), sep = ",", row.names = FALSE, col.names = FALSE)
+
+dataBP=read.csv("GO_biological.csv", header = F)
+dataBP$V2=trimws(gsub("\\s+", " ", dataBP$V2))
+write.table(dataBP, paste0(sample_name, "_GO_biological.txt"), sep = "\t", row.names = FALSE, col.names = FALSE)
+write.table(dataBP, paste0(sample_name, "_GO_biological.csv"), sep = ",", row.names = FALSE, col.names = FALSE) # nolint
+
+
 
 #CC
 nlim=round((head(dataCC$V1,n = 1)+150),digits = -2)
-p1<-ggplot(data=dataCC, aes(x=reorder(dataCC$V2,dataCC$V1), y=dataCC$V1))+
+p1<-ggplot(data=dataCC, aes(x=reorder(V2,V1), y=V1))+
   geom_bar(stat="identity", fill="green", width=.5)+
   coord_flip()+labs(x="Classification",y="Number of Sequences")+
   geom_text(aes(label=dataCC$V1), position=position_dodge(width=0.7), vjust=-0.0005, hjust=-.15)+
@@ -30,7 +43,7 @@ dev.off()
 
 #MF
 nlim=round((head(dataMF$V1,n = 1)+150),digits = -2)
-p2 <-ggplot(data=dataMF, aes(x=reorder(dataMF$V2,dataMF$V1), y=dataMF$V1))+
+p2 <-ggplot(data=dataMF, aes(x=reorder(V2,V1), y=V1))+
   geom_bar(stat="identity", fill="blue", width=.5)+
   coord_flip()+labs(x="Classification",y="Number of Sequences")+
   geom_text(aes(label=dataMF$V1), position=position_dodge(width=0.7), vjust=-0.0005, hjust=-.15)+
@@ -50,7 +63,7 @@ dev.off()
 
 #BP
 nlim=round((head(dataBP$V1,n = 1)+150),digits = -2)
-p3<-ggplot(data=dataBP, aes(x=reorder(dataBP$V2,dataBP$V1), y=dataBP$V1))+
+p3<-ggplot(data=dataBP, aes(x=reorder(V2,V1), y=V1))+
   geom_bar(stat="identity", fill="red", width=.5)+
   coord_flip()+labs(x="Classification",y="Number of Sequences")+
   geom_text(aes(label=dataBP$V1), position=position_dodge(width=0.7), vjust=-0.0005, hjust=-.15)+
