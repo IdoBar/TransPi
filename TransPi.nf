@@ -2245,7 +2245,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     
                     perl ./RnammerTranscriptome.pl --transcriptome !{transcriptome} --path_to_rnammer !{params.rnam}
 
-                    # mv !{sample_id}.combined.okay.fa.rnammer.gff !{sample_id}.rnammer.gff
+                    mv !{transcriptome}.rnammer.gff !{sample_id}.rnammer.gff
 
                     echo -e "\\n-- Done with RNAMMER --\\n"
                     '''
@@ -2389,8 +2389,9 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 echo -e "\\n-- Done with the GO --\\n"
 
                 echo -e "\\n-- Creating KEGG file from XLS... --\\n"
-
-                cat ${sample_id}.trinotate_annotation_report.xls | cut -f 1,14 | grep "KEGG" | tr "\\`" ";" | grep "KO:K" | sed 's/\\tKEGG/\\t#KEGG/g' | sed 's/KO:/KO:#/g' | cut -f 1,3 -d "#" | tr -d "#" >${sample_id}.KEGG.terms.txt
+                # this will actually output only KO terms, not KEGG!
+                # cat ${sample_id}.trinotate_annotation_report.xls | cut -f 1,14 | grep "KEGG" | tr "\\`" ";" | grep "KO:K" | sed 's/\\tKEGG/\\t#KEGG/g' | sed 's/KO:/KO:#/g' | cut -f 1,3 -d "#" | tr -d "#" >${sample_id}.KO.terms.txt
+                cat ${sample_id}.trinotate_annotation_report.xls | cut -f 1,14 | grep "KEGG" | tr "\\`" ";"  >${sample_id}.KEGG.terms.txt
 
                 echo -e "\\n-- Done with the KEGG --\\n"
 
@@ -2497,6 +2498,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
             script:
                 """
                 #get custom blast hits
+                set +e
                 cat ${sample_id}.trinotate_annotation_report.xls | cut -f 8 | grep [A-Z] | grep "|" | tr "\\`" "\\n" | \
                     cut -f 1 -d "^" | cut -f 3 -d "|" | cut -f 2 -d "_" >a.txt
 
