@@ -69,7 +69,28 @@ Rivera-Vicéns, R.E., García-Escudero, CA., Conci, N., Eitel, M., and Wörheide
 
 # Issues
 
-We tested TransPi using conda, singularity and docker. However, if you find a problem or get an error please let us know by opening an issue.
+I tested TransPi using conda, singularity and apptainer (IB). However, if you find a problem or get an error please let me know by opening an issue.
+
+1. Missing BUSCO container in the configuration - [Issue #53](https://github.com/PalMuc/TransPi/issues/53#issuecomment-1268051333). In some HPC systems, a firewall/proxy blocks automatic download of containers. This can be fixed by downlodaing all the required containers manually with `grep "singularity_pull_docker_container" TransPi.nf | cut -f 2 -d '"' | sort | uniq | tr -d \' | parallel --dry-run --rpl  "{outfile} s=https://==; s=[:/]+=-=g;" aria2c -c {} -o $NXF_SINGULARITY_CACHEDIR/{outfile}.img` (make sure that `$NXF_SINGULARITY_CACHEDIR` is defined in your `~/.bashrc`) 
+2. The precheck script fails to download the UniProt database due to change in the API, so large databases need to be downloaded manually from the web interface at this point - see [Issue #52](https://github.com/PalMuc/TransPi/issues/52)  
+3. Use the single TransPiContainer container and profile to fix issues with some of the tools (see the [documentation](https://palmuc.github.io/TransPi/#_containers))  
+4. Trinity and Velvet-Oases jobs are failing though they seem to complete without a problem (no output files are copied across from the compute nodes). It can be one of these possibilities:  
+    a. It appears that the way TransPi is writing the version numbers throws an error (when `$v` is defined multiple times). I fixed it by using a single `echo`/`printf` statement parsing the versions on the spot instead of assigning the temporary variables and printing them with multiple `echo` commands. This is probably has to do with pipes failing silently (see below).  
+    b. Some processes, such as `summary_custom_uniprot`, include complex pipelines (including multiple commands of `grep`, `sed`, `cut`, `awk`, etc.) fail due to `set -o pipefail` directive. It can be fixed by adding `set +o pipefail` to the top of the script.  
+5. `Rnammer` fails - it needs to be setup to use `hmmsearch2` (which can be downloaded from [this link](http://eddylab.org/software/hmmer/hmmer-2.3.2.tar.gz) and remove the `--cpu 1` flag from `core-rnammer`, see details [here](https://groups.google.com/g/trinityrnaseq-users/c/WZjkGSMUT3I)).  It can be done with the following command: `sed -i.bak 's/--cpu 1 //g' rnammer-1.2/core-rnammer`
+6. `rnaQUAST` fails -- it requires an additional tool (GeneMark S-T) to be installed and put in the `$PATH` separately. See details [here](https://github.com/ablab/rnaquast/issues/5#issuecomment-823996456). It can be installed as follows:  
+```
+mkdir -p ~/tools/GeneMarkST && cd ~/tools/GeneMarkST
+wget http://topaz.gatech.edu/GeneMark/tmp/GMtool_ZozF5/gmst_linux_64.tar.gz
+tar xzf gmst_linux_64.tar.gz
+ln -s $PWD/gmst.pl ~/bin/
+``` 
+7. `signalp` fails - need to edit the executable to allow it to find where it is being run from and increase the sequence limit (see [here](https://www.seqanswers.com/forum/bioinformatics/bioinformatics-aa/29132-how-to-increase-sequence-limit-in-signalp#post236326)) with the following command:  
+```
+sed -ri.bak 's|SIGNALP} = '\''.+|SIGNALP} = "\$FindBin::RealBin"|; s/BEGIN/use FindBin\;
+\nBEGIN/; s/MAX_ALLOWED_ENTRIES=.+/MAX_ALLOWED_ENTRIES=2000000;/' signalp
+```
+8. Process `summary_custom_uniprot` fails because of weird table merging and file redundancies done in bash. I edited `Tranbspi//bin/custom_uniprot_hits.R` to perform these tasks and export the `csv` file with the results.  
 
 ## Chat
 
