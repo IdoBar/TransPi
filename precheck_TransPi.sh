@@ -398,7 +398,9 @@ uniprot_taxon_DB(){
     read ans
     echo -e "\n\t -- Downloading UNIPROT proteins from Taxon ID: $ans -- \n"
     # curl -o uniprot_${ans}.fasta.gz "https://rest.uniprot.org/uniprotkb/stream?compressed=true&format=fasta&query=%28taxonomy_id%3A${ans}%29" 
-    curl -o uniprot_${ans}.fasta.gz "https://legacy.uniprot.org/uniprot/?query=taxonomy:${ans}&format=fasta&compress=yes&include=no"
+    # curl -o uniprot_${ans}.fasta.gz "https://legacy.uniprot.org/uniprot/?query=taxonomy:${ans}&format=fasta&compress=yes&include=no"
+    curl -o uniprot_${ans}.fasta.gz "https://rest.uniprot.org/uniprot/?query=taxonomy_id:${ans}&format=fasta&compress=yes&include=no"
+    # wget --no-check-certificate
     gunzip uniprot_${ans}.fasta.gz
     date -u >.lastrun.txt
     uni_c
@@ -425,7 +427,8 @@ uniprot_meta () {
             echo -e "\n\n\t -- Downloading current metazoan protein dataset from UNIPROT -- \n"
             echo -e "\n\t -- This could take a couple of minutes depending on connection. Please wait -- \n"
             # curl -o uniprot_metazoa_33208.fasta.gz "https://rest.uniprot.org/uniprotkb/stream?compressed=true&format=fasta&query=%28taxonomy_id%3A33208%29"
-            curl -o uniprot_metazoa_33208.fasta.gz "https://legacy.uniprot.org/uniprot/?query=taxonomy:33208&format=fasta&compress=yes&include=no"
+            # curl -o uniprot_metazoa_33208.fasta.gz "https://www.uniprot.org/uniprot/?query=taxonomy:33208&format=fasta&compress=yes&include=no"
+	    curl -o uniprot_metazoa_33208.fasta.gz "https://legacy.uniprot.org/uniprot/?query=taxonomy:33208&format=fasta&compress=yes&include=no"
             echo -e "\n\t -- Uncompressing uniprot_metazoa_33208.fasta.gz ... -- \n"
             gunzip uniprot_metazoa_33208.fasta.gz
             date -u >.lastrun.txt
@@ -470,7 +473,7 @@ uniprot_c () {
     fi
 }
 java_c () {
-	export NXF_VER=21.04.1 && curl -s https://get.nextflow.io | bash 2>.error_nextflow
+	export NXF_VER=22.11.1-edge && curl -s https://get.nextflow.io | bash 2>.error_nextflow
 	check_err=$( head -n 1 .error_nextflow | grep -c "java: command not found" )
 	if [ $check_err -eq 1 ];then
 		echo -e "\n\t\e[31m -- ERROR: Please install Java 1.8 (or later). Requirement for Nextflow --\e[39m\n"

@@ -410,8 +410,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 script:
                     """
                     fastqc --quiet --threads $task.cpus $reads
-                    # v=\$( fastqc --version | sed -e "s/FastQC v//g" )
-                    echo "FastQC: \$( fastqc --version | sed -e "s/FastQC v//g" )" >fastqc.version.txt
+                    v=\$( fastqc --version | sed -e "s/FastQC v//g" )
+                    echo "FastQC: \$v" >fastqc.version.txt
                     """
             }
         }
@@ -454,8 +454,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     --average_qual ${params.minQual} --overrepresentation_analysis --html ${sample_id}.fastp.html --json ${sample_id}.fastp.json \
                     --thread ${task.cpus} --report_title ${sample_id}
 
-                    # v=\$( fastp --version 2>&1 | awk '{print \$2}' )
-                    echo "fastp: \$( fastp --version 2>&1 | awk '{print \$2}' )" >fastp.version.txt
+                    v=\$( fastp --version 2>&1 | awk '{print \$2}' )
+                    echo "fastp: \$v" >fastp.version.txt
                     """
             }
 
@@ -558,8 +558,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     mv rRNAreads_rev* ${sample_id}_rRNA_reads.R2.fq
                     mv nonrRNAreads_fwd* ${sample_id}_no_rRNA.R1.fq
                     mv nonrRNAreads_rev* ${sample_id}_no_rRNA.R2.fq
-                    # v=\$( sortmerna -version | grep "SortMeRNA version" | awk '{print \$3}' )
-                    echo "SortMeRNA: \$( sortmerna -version | grep "SortMeRNA version" | awk '{print \$3}' )" >sortmerna.version.txt
+                    v=\$( sortmerna -version | grep "SortMeRNA version" | awk '{print \$3}' )
+                    echo "SortMeRNA: \$v" >sortmerna.version.txt
                     """
                 } else {
                     """
@@ -569,8 +569,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     mv rRNAreads_rev* ${sample_id}_rRNA_reads.R2.fq
                     mv nonrRNAreads_fwd* ${sample_id}_no_rRNA.R1.fq
                     mv nonrRNAreads_rev* ${sample_id}_no_rRNA.R2.fq
-                    # v=\$( sortmerna -version | grep "SortMeRNA version" | awk '{print \$3}' )
-                    echo "SortMeRNA: \$( sortmerna -version | grep "SortMeRNA version" | awk '{print \$3}' )" >sortmerna.version.txt
+                    v=\$( sortmerna -version | grep "SortMeRNA version" | awk '{print \$3}' )
+                    echo "SortMeRNA: \$v" >sortmerna.version.txt
                     """
                 }
             }
@@ -859,13 +859,10 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 Trinity --max_memory \${mem}G --seqType fq --left ${left} --right ${right} --CPU ${task.cpus} --no_normalize_reads --full_cleanup --output trinity_out_dir
 
                 mv trinity_out_dir.Trinity.fasta ${sample_id}.Trinity.fa
-                echo -e "\\n-- Writing version --\\n"
-                # v=\$( Trinity --version | grep "version" | head -n 1 | cut -f 2 -d "-" | tr -d "v" )
-                echo "Trinity: \$( Trinity --version | grep "version" | head -n 1 | cut -f 2 -d "-" | tr -d "v" )" > trinity.version.txt
 
-                echo -e "\\n-- Finished process --\\n"
-
-		        exit 0
+                v=\$( Trinity --version | grep "version" | head -n 1 | cut -f 2 -d "-" | tr -d "v" )
+                echo "Trinity: \$v" >trinity.version.txt
+		exit 0
                 """
         }
 
@@ -922,9 +919,9 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 done
 
                 rm -rf output*
-                # v=\$( SOAPdenovo-Trans-127mer --version | grep "version" | awk '{print \$2,\$3}' | cut -f 1 -d ":" | cut -f 2 -d " " )
-                echo "SOAP: \$( SOAPdenovo-Trans-127mer --version | grep "version" | awk '{print \$2,\$3}' | cut -f 1 -d ":" | cut -f 2 -d " " )" >soap.version.txt
-		        exit 0
+                v=\$( SOAPdenovo-Trans-127mer --version | grep "version" | awk '{print \$2,\$3}' | cut -f 1 -d ":" | cut -f 2 -d " " )
+                echo "SOAP: \$v" >soap.version.txt
+		exit 0
                 """
         }
 
@@ -972,31 +969,26 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 done
 
                 echo -e "\\n-- Finished with Velvet/Oases assemblies --\\n"
-                echo -e "\\n-- Replacing -Velvet- from contig names --\\n"
+
                 for x in `echo $k | tr "," " "`;do
                     sed -i "s/>/>Velvet.k\${x}./g" oases.\${x}/contigs.fa
                 done
-                echo -e "\\n-- Concatenating contigs --\\n"
+
                 cat oases.*/contigs.fa >${sample_id}.Velvet.fa
-                
-                echo -e "\\n-- Copy concatenatied assemblies for each kmer --\\n"
+
                 for x in `echo $k | tr "," " "`;do
                     cp oases.\${x}/contigs.fa ${sample_id}.Velvet.k\${x}.fa
                 done
 
                 rm -rf oases.*
-                echo -e "\\n-- Write versions --\\n"
-                printf "Velveth: \$( velveth | grep "Version" | cut -f 2 -d " " )\\nVelvetg: \$( velvetg | grep "Version" | cut -f 2 -d " " )\\nOases: \$( oases | grep "Version" | cut -f 2 -d " " )\\n" > velvet_oases.versions.txt
 
-                # v=\$( velveth | grep "Version" | cut -f 2 -d " " )
-                # echo "Velveth: \$( velveth | grep "Version" | cut -f 2 -d " " )" > velveth_oases.versions.txt
-                # v1=\$( velvetg | grep "Version" | cut -f 2 -d " " )
-                # echo "Velvetg: \$v1" > velvetg_oases.versions.txt
-                # v2=\$( oases | grep "Version" | cut -f 2 -d " " )
-                # echo "Oases: \$v2" > oases.versions.txt
-                # cat velveth_oases.versions.txt velvetg_oases.versions.txt oases.versions.txt > velvet_oases.versions.txt
-                echo -e "\\n-- Finished process --\\n"
-		        exit 0
+                v=\$( velveth | grep "Version" | cut -f 2 -d " " )
+                echo "Velveth: \$v" >velvet_oases.versions.txt
+                v=\$( velvetg | grep "Version" | cut -f 2 -d " " )
+                echo "Velvetg: \$v" >>velvet_oases.versions.txt
+                v=\$( oases | grep "Version" | cut -f 2 -d " " )
+                echo "Oases: \$v" >>velvet_oases.versions.txt
+		exit 0
                 """
         }
 
@@ -1048,9 +1040,9 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 rm -rf ${sample_id}_spades_*
 
-                # v=\$( rnaspades.py -v 2>&1 | awk '{print \$4}' | tr -d "v" )
-                echo "rna-SPADES: \$( rnaspades.py -v 2>&1 | awk '{print \$4}' | tr -d "v" )" >rna_spades.version.txt
-		        exit 0
+                v=\$( rnaspades.py -v 2>&1 | awk '{print \$4}' | tr -d "v" )
+                echo "rna-SPADES: \$v" >rna_spades.version.txt
+		exit 0
                 """
         }
 
@@ -1100,9 +1092,9 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 rm -rf ${sample_id}_transabyss_*
 
-                # v=\$( transabyss --version )
-                echo "Trans-ABySS: \$( transabyss --version )" >transabyss.version.txt
-		        exit 0
+                v=\$( transabyss --version )
+                echo "Trans-ABySS: \$v" >transabyss.version.txt
+		exit 0
                 """
 
         }
@@ -1145,7 +1137,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             script:
                 def mem_MB=(task.memory.toMega())
-                if ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'docker' || workflow.containerEngine == 'apptainer' ) && params.oneContainer) {
+                if ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'docker') && params.oneContainer) {
                     """
                     echo -e "\\n-- Starting EviGene --\\n"
 
@@ -1162,14 +1154,14 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                         rm -rf tmpfiles/
                     fi
 
-                    # v=\$( echo "2019.05.14" )
-                    # v=\$( blastn -version | head -n1 | awk '{print \$2}' )
-                    # echo "Blast: \$v" >>evigene.version.txt
-                    # v=\$( cd-hit -h | head -n1 | cut -f 1 -d "(" | cut -f 2 -d "n" )
-                    # echo "CD-HIT: \$v" >>evigene.version.txt
-                    # v=\$( exonerate -v | head -n1 | cut -f 5 -d " " )
-                    # echo "Exonerate: \$v" >>evigene.version.txt
-                    printf "EvidentialGene: 2019.05.14\\nBlast: \$( blastn -version | head -n1 | awk '{print \$2}' )\\nCD-HIT: \$( cd-hit -h | head -n1 | cut -f 1 -d "(" | cut -f 2 -d "n" )\\nExonerate: \$( exonerate -v | head -n1 | cut -f 5 -d " " )\\n" > evigene.version.txt
+                    v=\$( echo "2019.05.14" )
+                    echo "EvidentialGene: \$v" >evigene.version.txt
+                    v=\$( blastn -version | head -n1 | awk '{print \$2}' )
+                    echo "Blast: \$v" >>evigene.version.txt
+                    v=\$( cd-hit -h | head -n1 | cut -f 1 -d "(" | cut -f 2 -d "n" )
+                    echo "CD-HIT: \$v" >>evigene.version.txt
+                    v=\$( exonerate -v | head -n1 | cut -f 5 -d " " )
+                    echo "Exonerate: \$v" >>evigene.version.txt
                     """
                 } else {
                     """
@@ -1188,14 +1180,14 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                         rm -rf tmpfiles/
                     fi
 
-                    # v=\$( echo "2019.05.14" )
-                    # v=\$( blastn -version | head -n1 | awk '{print \$2}' )
-                    # echo "Blast: \$v" >>evigene.version.txt
-                    # v=\$( cd-hit -h | head -n1 | cut -f 1 -d "(" | cut -f 2 -d "n" )
-                    # echo "CD-HIT: \$v" >>evigene.version.txt
-                    # v=\$( exonerate -v | head -n1 | cut -f 5 -d " " )
-                    # echo "Exonerate: \$v" >>evigene.version.txt
-                    printf "EvidentialGene: 2019.05.14\\nBlast: \$( blastn -version | head -n1 | awk '{print \$2}' )\\nCD-HIT: \$( cd-hit -h | head -n1 | cut -f 1 -d "(" | cut -f 2 -d "n" )\\nExonerate: \$( exonerate -v | head -n1 | cut -f 5 -d " " )\\n" > evigene.version.txt
+                    v=\$( echo "2019.05.14" )
+                    echo "EvidentialGene: \$v" >evigene.version.txt
+                    v=\$( blastn -version | head -n1 | awk '{print \$2}' )
+                    echo "Blast: \$v" >>evigene.version.txt
+                    v=\$( cd-hit -h | head -n1 | cut -f 1 -d "(" | cut -f 2 -d "n" )
+                    echo "CD-HIT: \$v" >>evigene.version.txt
+                    v=\$( exonerate -v | head -n1 | cut -f 5 -d " " )
+                    echo "Exonerate: \$v" >>evigene.version.txt
                 	"""
                 }
         }
@@ -1234,31 +1226,21 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
             script:
                 if (params.onlyEvi){
                 """
-                echo -e "\\n-- Starting rnaQUAST --\\n"
                 rnaQUAST.py --transcripts ${r1} -o ${sample_id}.rna_quast -t ${task.cpus} --blat
-                echo -e "\\n-- Preparing rnaQuast results file --\\n"
                 echo "Category,Value" >${sample_id}_rnaQUAST.csv
-                echo -e "\\n-- Adding metrics to rnaQUAST results file --\\n"
                 cat ${sample_id}.rna_quast/*_output/basic_metrics.txt | grep -v "METRICS" |  sed 's/\\(\\ \\)* \\([0-9]\\)/,\\2/g' | sed 's/>,/>/g' | grep [0-9] >>${sample_id}_rnaQUAST.csv
-                echo -e "\\n-- Adding Genes to rnaQUAST results file --\\n"
                 cat ${sample_id}.rna_quast/*_output/basic_metrics.txt | grep "Genes" | sed 's/\\(\\ \\)* \\([0-9]\\)/,\\2/g' >>${sample_id}_rnaQUAST.csv
-                # v=\$( rnaQUAST.py | grep "QUALITY ASSESSMENT" | head -n1 | awk -F " v." '{print \$2}' )
-                echo -e "\\n-- Writing rnaQUAST version --\\n"
-                echo "rnaQUAST: \$( rnaQUAST.py | grep "QUALITY ASSESSMENT" | head -n1 | awk -F " v." '{print \$2}' )" > rnaquast.version.txt
+                v=\$( rnaQUAST.py | grep "QUALITY ASSESSMENT" | head -n1 | awk -F " v." '{print \$2}' )
+                echo "rnaQUAST: \$v" >rnaquast.version.txt
                 """
                 } else {
                 """
-                echo -e "\\n-- Starting rnaQUAST --\\n"
                 rnaQUAST.py --transcripts ${assembly} -1 ${r1} -2 ${r2} -o ${sample_id}.rna_quast -t ${task.cpus} --blat
-                echo -e "\\n-- Preparing rnaQuast results file --\\n"
                 echo "Category,Value" >${sample_id}_rnaQUAST.csv
-                echo -e "\\n-- Adding metrics to rnaQUAST results file --\\n"
                 cat ${sample_id}.rna_quast/*_output/basic_metrics.txt | grep -v "METRICS" |  sed 's/\\(\\ \\)* \\([0-9]\\)/,\\2/g' | sed 's/>,/>/g' | grep [0-9] >>${sample_id}_rnaQUAST.csv
-                echo -e "\\n-- Adding Genes to rnaQUAST results file --\\n"
                 cat ${sample_id}.rna_quast/*_output/basic_metrics.txt | grep "Genes" | sed 's/\\(\\ \\)* \\([0-9]\\)/,\\2/g' >>${sample_id}_rnaQUAST.csv
-                # v=\$( rnaQUAST.py | grep "QUALITY ASSESSMENT" | head -n1 | awk -F " v." '{print \$2}' )
-                echo -e "\\n-- Writing rnaQUAST version --\\n"
-                echo "rnaQUAST: \$( rnaQUAST.py | grep "QUALITY ASSESSMENT" | head -n1 | awk -F " v." '{print \$2}' )" > rnaquast.version.txt
+                v=\$( rnaQUAST.py | grep "QUALITY ASSESSMENT" | head -n1 | awk -F " v." '{print \$2}' )
+                echo "rnaQUAST: \$v" >rnaquast.version.txt
                 """
                 }
         }
@@ -1348,8 +1330,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 cp ${sample_id}.TransPi.bus4/short_summary.*.${sample_id}.TransPi.bus4.txt .
                 cp ${sample_id}.TransPi.bus4/run_*/full_table.tsv full_table_${sample_id}.TransPi.bus4.tsv
 
-                # v=\$( busco -v | cut -f 2 -d " " )
-                printf "BUSCO4: \$( busco -v | cut -f 2 -d " " )\\n" > busco4.version.txt
+                v=\$( busco -v | cut -f 2 -d " " )
+                echo "BUSCO4: \$v" >busco4.version.txt
                 """
         }
 
@@ -1390,8 +1372,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 bowtie2-build \${ass} \${ass} --threads ${task.cpus}
                 bowtie2 -x \${ass} -1 \${r1} -2 \${r2} -p ${task.cpus} 2>log_\${ass}.txt | samtools view -@ ${task.cpus} -bS - >\${ass}.bam
                 rm *.bam
-                # v=\$( bowtie2 --version | head -n1 | cut -f 3 -d " " )
-                printf "Bowtie2: \$( bowtie2 --version | head -n1 | cut -f 3 -d " " )\\n" > bowtie2.version.txt
+                v=\$( bowtie2 --version | head -n1 | cut -f 3 -d " " )
+                echo "Bowtie2: \$v" >bowtie2.version.txt
                 """
         }
 
@@ -1794,8 +1776,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                     echo -e "\\n-- DONE with TransDecoder --\\n"
 
-                    # v=\$( TransDecoder.LongOrfs --version | cut -f 2 -d " " )
-                    echo "Transdecoder: \$( TransDecoder.LongOrfs --version | cut -f 2 -d " " )" >transdecoder.version.txt
+                    v=\$( TransDecoder.LongOrfs --version | cut -f 2 -d " " )
+                    echo "Transdecoder: \$v" >transdecoder.version.txt
                     """
                 }
 
@@ -1833,8 +1815,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                     echo -e "\\n-- Done with TransDecoder.LongOrfs --\\n"
 
-                    # v=\$( TransDecoder.LongOrfs --version | cut -f 2 -d " " )
-                    echo "Transdecoder: \$( TransDecoder.LongOrfs --version | cut -f 2 -d " " )" >transdecoder.version.txt
+                    v=\$( TransDecoder.LongOrfs --version | cut -f 2 -d " " )
+                    echo "Transdecoder: \$v" >transdecoder.version.txt
                     """
             }
 
@@ -1847,12 +1829,12 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 publishDir "${params.outdir}/transdecoder", mode: "copy", overwrite: true
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
-                if (params.oneContainer){ container "${params.diamondcontainer}" } else {
+                if (params.oneContainer){ container "${params.TPcontainer}" } else {
                 container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
                 }
-               
+
                 input:
-                    tuple sample_id, file(pep) from transdecoder_diamond 
+                    tuple sample_id, file(pep) from transdecoder_diamond
 
                 output:
                     tuple sample_id, file("${sample_id}.diamond_blastp.outfmt6") into transdecoder_predict_diamond
@@ -1867,7 +1849,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     fi
                     diamond blastp -d \${dbPATH}/${params.uniname}.dmnd -q ${pep} -p ${task.cpus} -f 6 -k 1 -e 0.00001 > ${sample_id}.diamond_blastp.outfmt6
 
-	            echo -e "\\n-- Done with Diamond (blastp) --\\n"
+		    echo -e "\\n-- Done with Diamond (blastp) --\\n"
                     """
             }
 
@@ -2016,7 +1998,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
             publishDir "${workDir}/.versions", mode: "copy", overwrite: true, pattern: "*.version.txt"
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
-            if (params.oneContainer){ container "${params.diamondcontainer}" } else {
+            if (params.oneContainer){ container "${params.TPcontainer}" } else {
             container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
             }
 
@@ -2043,7 +2025,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                         if [ ! -e \${dbPATH}/uniprot_sprot.pep.dmnd ];then
                             # cp \${dbPATH}/uniprot_sprot.pep .
                             diamond makedb --in \${dbPATH}/uniprot_sprot.pep -d \${dbPATH}/uniprot_sprot.pep -p ${task.cpus}
-			            fi
+			fi
                         # cp \${dbPATH}/uniprot_sprot.pep.dmnd .
                         echo -e "\\n-- Starting with Diamond (blastx) --\\n"
                         diamond blastx -d \${dbPATH}/uniprot_sprot.pep.dmnd -q ${assembly} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.diamond_blastx.outfmt6
@@ -2055,8 +2037,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 fi
                 echo -e "\\n-- Done with Diamond --\\n"
 
-                # v=\$( diamond --version 2>&1 | tail -n 1 | cut -f 3 -d " " )
-                echo "Diamond: \$( diamond --version 2>&1 | tail -n 1 | cut -f 3 -d " " )" >diamond.version.txt
+                v=\$( diamond --version 2>&1 | tail -n 1 | cut -f 3 -d " " )
+                echo "Diamond: \$v" >diamond.version.txt
                 """
         }
 
@@ -2067,7 +2049,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
             tag "${sample_id}"
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
-            if (params.oneContainer){ container "${params.diamondcontainer}" } else {
+            if (params.oneContainer){ container "${params.TPcontainer}" } else {
             container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
             }
 
@@ -2080,7 +2062,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             script:
                 """
-	            dbPATH=\$(dirname ${params.uniprot})
+		dbPATH=\$(dirname ${params.uniprot})
                     echo -e "\\n-- Starting Diamond (blastp) --\\n"
                         if [ ! -e \${dbPATH}/${params.uniname}.dmnd ];then
                                 # cp \${dbPATH}/${params.uniname} .
@@ -2092,12 +2074,14 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     echo -e "\\n-- Starting with Diamond (blastp) --\\n"
                     diamond blastp -d  \${dbPATH}/${params.uniname}.dmnd -q ${transdecoder} -p ${task.cpus} -f 6 -k 1 -e 0.001 >${sample_id}.custom.diamond_blastp.outfmt6
                     echo -e "\\n-- Done with Diamond (blastp)  --\\n"
+
+                echo -e "\\n-- Done with Diamond --\\n"
                 """
         }
 
         process hmmer_trinotate {
 
-            label 'med_cpus'
+            label 'low_cpus'
 
             tag "${sample_id}"
 
@@ -2143,8 +2127,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 fi
                 echo -e "\\n-- Done with HMMER --\\n"
 
-                # v=\$( hmmsearch -h | head -n 2 | cut -f 3 -d " " | grep [0-9] )
-                echo "HMMER: \$( hmmsearch -h | head -n 2 | cut -f 3 -d " " | grep [0-9] )" > hmmer.version.txt
+                v=\$( hmmsearch -h | head -n 2 | cut -f 3 -d " " | grep [0-9] )
+                echo "HMMER: \$v" >hmmer.version.txt
                 """
         }
 
@@ -2240,11 +2224,6 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             process rnammer_trinotate {
 
-                conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::trinotate=3.2.2=pl5262hdfd78af_0" : null)
-                if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/trinotate:3.2.2--pl5262hdfd78af_0" : "quay.io/biocontainers/trinotate:3.2.2--pl5262hdfd78af_0")
-                }
-
                 label 'low_cpus'
 
                 tag "${sample_id}"
@@ -2258,19 +2237,16 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 shell:
                     '''
                     # set +e
-		            # Fix path of rnammer utilities bin
-                    # mkdir util
+		    # Fix path of rnammer utilities bin
                     ln -s /opt/conda/envs/TransPi/bin/superScaffoldGenerator.pl ./
                     ln -s /opt/conda/envs/TransPi/bin/rnammer_supperscaffold_gff_to_indiv_transcripts.pl ./
-                    sed 's|FindBin::RealBin/util|FindBin::RealBin|g' /opt/conda/envs/TransPi/bin/RnammerTranscriptome.pl > ./RnammerTranscriptome.pl
-                    chmod +x ./RnammerTranscriptome.pl
-                    # source activate /opt/conda/envs/TransPi
+                    sed 's|\\$FindBin::RealBin/util|.|g' /opt/conda/envs/TransPi/bin/RnammerTranscriptome.pl > ./RnammerTranscriptome.pl
 
                     #RNAMMER to identify rRNA transcripts
 			
                     echo -e "\\n-- Starting with RNAMMER --\\n"
 
-                    ./RnammerTranscriptome.pl --transcriptome !{transcriptome} --path_to_rnammer !{params.rnam}
+                    perl ./RnammerTranscriptome.pl --transcriptome !{transcriptome} --path_to_rnammer !{params.rnam}
 
                     mv !{transcriptome}.rnammer.gff !{sample_id}.rnammer.gff
 
@@ -2305,7 +2281,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             tag "${sample_id}"
 
-            publishDir "${params.outdir}/trinotate", mode: "copy", overwrite: true, pattern: "*.{terms.txt,xls,sqlite,gene_trans_map}"
+            publishDir "${params.outdir}/trinotate", mode: "copy", overwrite: true, pattern: "*.{terms.txt,xls}"
             publishDir "${workDir}/.versions", mode: "copy", overwrite: true, pattern: "*.version.txt"
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::trinotate=3.2.2=pl5262hdfd78af_0" : null)
@@ -2326,7 +2302,6 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             script:
                 """
-		        set +o pipefail
                 for x in `echo ${files}`;do
                     echo \${x} >>.vars.txt
                 done
@@ -2341,29 +2316,22 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 signalp=\$( cat .vars.txt | grep "${sample_id}.signalp.out" )
                 tmhmm=\$( cat .vars.txt | grep "${sample_id}.tmhmm.out" )
                 rnammer=\$( cat .vars.txt | grep "${sample_id}.rnammer.gff" )
-                gene_trans_map=${sample_id}.gene_trans_map
 
                 #Generate gene_trans_map
                 #Not using get_Trinity_gene_to_trans_map.pl since all the names are uniq
-                #cat \${assembly} | awk '{print \$1}' | grep ">" | cut -c 2- >a.txt
+                cat \${assembly} | awk '{print \$1}' | grep ">" | cut -c 2- >a.txt
 
-                #paste a.txt a.txt >\${gene_trans_map} - does not work in container
-                #touch \${gene_trans_map}
-                #for x in `cat a.txt`;do echo -e \${x}"\\t"\${x} >> \${gene_trans_map} ;done
-                ass_pattern="*Trinity.fa"
-                if [[ \${assembly} == \${ass_pattern} ]]; then
-                    get_Trinity_gene_to_trans_map.pl \${assembly} > \${gene_trans_map}
-                else 
-                    cat \${assembly} | awk '/>/{OFS="\t";sub(/>/, "", \$1); print \$1,\$1}' > \${gene_trans_map}
-                fi
+                #paste a.txt a.txt >\${assembly}.gene_trans_map - does not work in container
+                touch \${assembly}.gene_trans_map
+                for x in `cat a.txt`;do echo -e \${x}"\\t"\${x} >>\${assembly}.gene_trans_map ;done
+
                 #Get Trinotate.sqlite from folder (original)
-                cp ${params.Tsql} ./\${assembly}.sqlite
-                sqlname="\${assembly}.sqlite"
-                #sqlname=`echo ${params.Tsql} | tr "\\/" "\\n" | grep "\\.sqlite"`
+                cp ${params.Tsql} .
+                sqlname=`echo ${params.Tsql} | tr "\\/" "\\n" | grep "\\.sqlite"`
 
                 echo -e "\\n-- Running Trinotate --\\n"
 
-                Trinotate \$sqlname init --gene_trans_map \${gene_trans_map} --transcript_fasta \${assembly} --transdecoder_pep \${transdecoder}
+                Trinotate \$sqlname init --gene_trans_map \${assembly}.gene_trans_map --transcript_fasta \${assembly} --transdecoder_pep \${transdecoder}
 
                 echo -e "\\n-- Ending run of Trinotate --\\n"
 
@@ -2427,13 +2395,13 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
 		# this will actually output only KO terms, not KEGG!
                 # cat ${sample_id}.trinotate_annotation_report.xls | cut -f 1,14 | grep "KEGG" | tr "\\`" ";" | grep "KO:K" | sed 's/\\tKEGG/\\t#KEGG/g' | sed 's/KO:/KO:#/g' | cut -f 1,3 -d "#" | tr -d "#" >${sample_id}.KO.terms.txt
-                cat ${sample_id}.trinotate_annotation_report.xls | cut -f 1,14 | grep "KEGG" | tr "\\`" ";"  > ${sample_id}.KEGG.terms.txt 
+                cat ${sample_id}.trinotate_annotation_report.xls | cut -f 1,14 | grep "KEGG" | tr "\\`" ";"  > ${sample_id}.KEGG.terms.txt
 
                 echo -e "\\n-- Done with the KEGG --\\n"
 
                 echo -e "\\n-- Creating eggNOG file from XLS... --\\n"
 
-                cat ${sample_id}.trinotate_annotation_report.xls | cut -f 1,13 | grep "OG" | tr "\\`" ";" | sed 's/^/#/g' | sed 's/;/\\n;/g' | cut -f 1 -d "^" | tr -d "\\n" | tr "#" "\\n" | grep "OG" >${sample_id}.eggNOG_COG.terms.txt 
+                cat ${sample_id}.trinotate_annotation_report.xls | cut -f 1,13 | grep "OG" | tr "\\`" ";" | sed 's/^/#/g' | sed 's/;/\\n;/g' | cut -f 1 -d "^" | tr -d "\\n" | tr "#" "\\n" | grep "OG" >${sample_id}.eggNOG_COG.terms.txt
 
                 echo -e "\\n-- Done with the eggNOG --\\n"
 
@@ -2444,13 +2412,12 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 echo -e "\\n-- Done with the PFAM --\\n"
 
                 echo -e "\\n-- DONE with Trinotate --\\n"
-                mv Trino
-                # v=\$( echo 3.2.1 )
-                echo "Trinotate: 3.2.1" >trinotate.version.txt
 
-                # v=\$( perl -v | head -n2 | grep version | cut -f 1 -d ")" | cut -f 2 -d "(" | tr -d "v" )
-                echo "Perl: \$( perl -v | head -n2 | grep version | cut -f 1 -d ")" | cut -f 2 -d "(" | tr -d "v" )" >perl.version.txt
-                # printf ""
+                v=\$( echo 3.2.1 )
+                echo "Trinotate: \$v" >trinotate.version.txt
+
+                v=\$( perl -v | head -n2 | grep version | cut -f 1 -d ")" | cut -f 2 -d "(" | tr -d "v" )
+                echo "Perl: \$v" >perl.version.txt
                 """
         }
 
@@ -2487,7 +2454,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     echo \${line} | cut -f 2,3,4 -d "#" | grep "GO:" | tr "#" "\\n" | tr "\\`" "\\n" | sed 's/\\. /,/g' | tr "," "\\n" | grep "GO:" | sort -u >>final_GOs.txt
                 done<all_GOs.txt
 
-	        cat final_GOs.txt | tr [a-z] [A-Z] | grep "CELLULAR_COMPONENT" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed -r 's/^\s+//; s/^([0-9]+) /\\1,/' >GO_cellular.csv
+		cat final_GOs.txt | tr [a-z] [A-Z] | grep "CELLULAR_COMPONENT" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed -r 's/^\s+//; s/^([0-9]+) /\\1,/' >GO_cellular.csv
                 cat final_GOs.txt | tr [a-z] [A-Z] | grep "BIOLOGICAL_PROCESS" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed -r 's/^\s+//; s/^([0-9]+) /\\1,/' >GO_biological.csv
                 cat final_GOs.txt | tr [a-z] [A-Z] | grep "MOLECULAR_FUNCTION" | cut -f 3 -d "^" | sort | uniq -c | sort -nr | head -n 15 | sed -r 's/^\s+//; s/^([0-9]+) /\\1,/' >GO_molecular.csv
 
@@ -2504,8 +2471,9 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 rm all_GOs.txt final_GOs.txt
 
-                # v=\$( R --version | grep "R version" | awk '{print \$3}' )
-                echo "R: \$( R --version | grep "R version" | awk '{print \$3}' )" > r.version.txt
+
+                v=\$( R --version | grep "R version" | awk '{print \$3}' )
+                echo "R: \$v" >r.version.txt
                 '''
         }
 
@@ -2530,42 +2498,37 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             script:
                 """
-	        set +o pipefail
-	        # set -x
                 #get custom blast hits
-                echo -e "\\n-- Extracting blast hits --\\n"
-
                 cat ${sample_id}.trinotate_annotation_report.xls | cut -f 8 | grep [A-Z] | grep "|" | tr "\\`" "\\n" | \
                     cut -f 1 -d "^" | cut -f 3 -d "|" | cut -f 2 -d "_" >a.txt
-                echo -e "\\n-- Extracting Tax names --\\n"
+
                 cat ${sample_id}.trinotate_annotation_report.xls | cut -f 9 | grep [A-Z] | grep "|" | tr "\\`" "\\n" | \
                     cut -f 1 -d "^" | cut -f 3 -d "|" | cut -f 2 -d "_" >b.txt
-                echo -e "\\n-- Combining tables --\\n"
+
                 cat a.txt b.txt | sort | uniq -c | sort -nr | head -n 20 | awk 'OFS="," {print \$1,\$2}' >${sample_id}_custom_uniprot_hits.txt
-                echo -e "\\n-- Removing temp files --\\n"
+
                 rm a.txt b.txt
-                echo -e "\\n-- Copying taxonomy file --\\n"
+
                 cp ${params.pipeInstall}/conf/uni_tax.txt .
 
-                # cp ${sample_id}_custom_uniprot_hits.txt ${sample_id}_custom_uniprot_hits
+                cp ${sample_id}_custom_uniprot_hits.txt ${sample_id}_custom_uniprot_hits
 
-                # while read line;do
-                #    a=\$( echo \${line} | cut -f 2 -d "," )
-                #    b=\$( cat uni_tax.txt | grep "\${a}" | cut -f 2 -d "," | wc -l )
-                #    if [ "\${b}" == "1" ];then
-                #        c=\$( cat uni_tax.txt | grep "\${a}" | cut -f 2 -d "," )
-                #        sed -i "s/\${a}/\${c}/" ${sample_id}_custom_uniprot_hits
-                #    fi
-                # done <${sample_id}_custom_uniprot_hits.txt
+                while read line;do
+                    a=\$( echo \${line} | cut -f 2 -d "," )
+                    b=\$( cat uni_tax.txt | grep "\${a}" | cut -f 2 -d "," | wc -l )
+                    if [ "\${b}" == "1" ];then
+                        c=\$( cat uni_tax.txt | grep "\${a}" | cut -f 2 -d "," )
+                        sed -i "s/\${a}/\${c}/" ${sample_id}_custom_uniprot_hits
+                    fi
+                done <${sample_id}_custom_uniprot_hits.txt
 
-                # rm ${sample_id}_custom_uniprot_hits.txt uni_tax.txt
-                # mv ${sample_id}_custom_uniprot_hits ${sample_id}_custom_uniprot_hits.txt
-                echo -e "\\n-- Copy R script --\\n"
+                rm ${sample_id}_custom_uniprot_hits.txt uni_tax.txt
+                mv ${sample_id}_custom_uniprot_hits ${sample_id}_custom_uniprot_hits.txt
+
                 cp ${params.pipeInstall}/bin/custom_uniprot_hits.R .
-                echo -e "\\n-- Execute R script --\\n"
                 Rscript custom_uniprot_hits.R ${sample_id}
 
-                # cp ${sample_id}_custom_uniprot_hits.txt ${sample_id}_custom_uniprot_hits.csv
+                cp ${sample_id}_custom_uniprot_hits.txt ${sample_id}_custom_uniprot_hits.csv
                 """
         }
 
@@ -2630,8 +2593,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 ${params.pipeInstall}/bin/len.py ${dist} >all_transcript_sizes.txt
                 mv all_transcript_sizes.txt ${sample_id}_sizes.txt
 
-                # v=\$( python --version | cut -f 2 -d " " )
-                echo "Python: \$( python --version | cut -f 2 -d " " )" > python.version.txt
+                v=\$( python --version | cut -f 2 -d " " )
+                echo "Python: \$v" >python.version.txt
                 """
         }
 
@@ -2812,7 +2775,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     tag "${sample_id}"
 
                     conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
-                    if (params.oneContainer){ container "${params.diamondcontainer}" } else {
+                    if (params.oneContainer){ container "${params.TPcontainer}" } else {
                     container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
                     }
 
@@ -2859,8 +2822,8 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                     	psytrans.py ${transcriptome} -A ${host} -B ${symbiont} -b ${database} -t temp -n ${params.psyval}
                         mv species1_${transcriptome} ${sample_id}_only.fasta
                         mv species2_${transcriptome} ${sample_id}_removed.fasta
-                        # v=\$( echo 1.0.0 )
-                        echo "Psytrans: 1.0.0" >psytrans.version.txt
+                        v=\$( echo 1.0.0 )
+                        echo "Psytrans: \$v" >psytrans.version.txt
                     	"""
                 }
 
@@ -2870,7 +2833,6 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
             }
         }
     }
-/*
     if (params.all || params.onlyAnn) {
 
         if (params.addAnnotation) {
@@ -2898,7 +2860,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
         }
 
     }
-*/
+
     // check channles and try to do one report only
     if (params.all) {
 
@@ -2973,29 +2935,27 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 echo -e "\\n-- Databases name and last update --" >>.runInfo.txt
 
-                # v=\$( echo ${params.uniname} )
-                echo "Uniprot_DB: \$( echo ${params.uniname} )" >>.runInfo.txt
+                v=\$( echo ${params.uniname} )
+                echo "Uniprot_DB: \$v" >>.runInfo.txt
 
                 if [ -f ${params.pipeInstall}/DBs/uniprot_db/.lastrun.txt ];then
-                    echo -e "Uniprot_DB last update: \$( cat ${params.pipeInstall}/DBs/uniprot_db/.lastrun.txt ) \\n" >>.runInfo.txt
+                    v=\$( cat ${params.pipeInstall}/DBs/uniprot_db/.lastrun.txt )
                 else
-                    echo -e "Uniprot_DB last update: No info available. Check Instructions on README. \\n" >>.runInfo.txt
+                    v="No info available. Check Instructions on README."
                 fi
-                # echo -e "Uniprot_DB last update: \$v \\n" >>.runInfo.txt
+                echo -e "Uniprot_DB last update: \$v \\n" >>.runInfo.txt
 
                 if [ -f ${params.pipeInstall}/DBs/hmmerdb/.lastrun.txt ];then
-                    echo -e "PfamA last update: \$( cat ${params.pipeInstall}/DBs/hmmerdb/.lastrun.txt ) \\n" >>.runInfo.txt
-                    # v=\$( cat ${params.pipeInstall}/DBs/hmmerdb/.lastrun.txt )
+                    v=\$( cat ${params.pipeInstall}/DBs/hmmerdb/.lastrun.txt )
                 else
-                    # v="No info available. Check Instructions on README."
-                    echo -e "PfamA last update: No info available. Check Instructions on README. \\n" >>.runInfo.txt
+                    v="No info available. Check Instructions on README."
                 fi
-                # echo -e "PfamA last update: \$v \\n" >>.runInfo.txt
+                echo -e "PfamA last update: \$v \\n" >>.runInfo.txt
 
-                # v=\$( echo ${params.busco4db} | tr "/" "\\n" | tail -n 1 )
-                echo "BUSCO_v4_DB: \$( echo ${params.busco4db} | tr "/" "\\n" | tail -n 1 )" >>.runInfo.txt
+                v=\$( echo ${params.busco4db} | tr "/" "\\n" | tail -n 1 )
+                echo "BUSCO_v4_DB: \$v" >>.runInfo.txt
 
-                echo -e "\\n-- Program versions --" >> .runInfo.txt
+                echo -e "\\n-- Program versions --" >>.runInfo.txt
                 """
         }
     }

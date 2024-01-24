@@ -1,3 +1,4 @@
+DBs/
 busco_db/
 diamonddb/
 hmmerdb/
@@ -19,3 +20,4 @@ cbs-dtu-tools.tar.gz
 Singularity
 Dockerfile
 evigene/
+*.sif

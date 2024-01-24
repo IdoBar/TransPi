@@ -17,8 +17,7 @@ write.table(dataMF, paste0(sample_name, "_GO_molecular.csv"), sep = ",", row.nam
 dataBP=read.csv("GO_biological.csv", header = F)
 dataBP$V2=trimws(gsub("\\s+", " ", dataBP$V2))
 write.table(dataBP, paste0(sample_name, "_GO_biological.txt"), sep = "\t", row.names = FALSE, col.names = FALSE)
-write.table(dataBP, paste0(sample_name, "_GO_biological.csv"), sep = ",", row.names = FALSE, col.names = FALSE) # nolint
-
+write.table(dataBP, paste0(sample_name, "_GO_biological.csv"), sep = ",", row.names = FALSE, col.names = FALSE)
 
 
 #CC
@@ -26,7 +25,7 @@ nlim=round((head(dataCC$V1,n = 1)+150),digits = -2)
 p1<-ggplot(data=dataCC, aes(x=reorder(V2,V1), y=V1))+
   geom_bar(stat="identity", fill="green", width=.5)+
   coord_flip()+labs(x="Classification",y="Number of Sequences")+
-  geom_text(aes(label=dataCC$V1), position=position_dodge(width=0.7), vjust=-0.0005, hjust=-.15)+
+  geom_text(aes(label=V1), position=position_dodge(width=0.7), vjust=-0.0005, hjust=-.15)+
   theme(axis.text=element_text(size=10))+ylim(0,nlim)+theme(text = element_text(size = 15))+
   theme(axis.text.x=element_text(size=12,angle=0))+theme(axis.title=element_text(size=15,face="bold"))+
   ggtitle(paste(sample_name,"Cellular Componenet GOs",sep=" "))+
@@ -46,7 +45,7 @@ nlim=round((head(dataMF$V1,n = 1)+150),digits = -2)
 p2 <-ggplot(data=dataMF, aes(x=reorder(V2,V1), y=V1))+
   geom_bar(stat="identity", fill="blue", width=.5)+
   coord_flip()+labs(x="Classification",y="Number of Sequences")+
-  geom_text(aes(label=dataMF$V1), position=position_dodge(width=0.7), vjust=-0.0005, hjust=-.15)+
+  geom_text(aes(label=V1), position=position_dodge(width=0.7), vjust=-0.0005, hjust=-.15)+
   theme(axis.text=element_text(size=10))+ylim(0,nlim)+theme(text = element_text(size = 15))+
   theme(axis.text.x=element_text(size=12,angle=0))+theme(axis.title=element_text(size=15,face="bold"))+
   ggtitle(paste(sample_name,"Molecular Function GOs",sep=" "))+
@@ -66,7 +65,7 @@ nlim=round((head(dataBP$V1,n = 1)+150),digits = -2)
 p3<-ggplot(data=dataBP, aes(x=reorder(V2,V1), y=V1))+
   geom_bar(stat="identity", fill="red", width=.5)+
   coord_flip()+labs(x="Classification",y="Number of Sequences")+
-  geom_text(aes(label=dataBP$V1), position=position_dodge(width=0.7), vjust=-0.0005, hjust=-.15)+
+  geom_text(aes(label=V1), position=position_dodge(width=0.7), vjust=-0.0005, hjust=-.15)+
   theme(axis.text=element_text(size=10))+ylim(0,nlim)+theme(text = element_text(size = 15))+
   theme(axis.text.x=element_text(size=12,angle=0))+theme(axis.title=element_text(size=15,face="bold"))+
   ggtitle(paste(sample_name,"Biological Processes GOs",sep=" "))+
