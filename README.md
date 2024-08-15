@@ -95,7 +95,7 @@ ln -s $PWD/gmst.pl ~/bin/
 sed -ri.bak 's|SIGNALP} = '\''.+|SIGNALP} = "\$FindBin::RealBin"|; s/BEGIN/use FindBin\;
 \nBEGIN/; s/MAX_ALLOWED_ENTRIES=.+/MAX_ALLOWED_ENTRIES=2000000;/' signalp
 ```
-9. Process `summary_custom_uniprot` fails because of weird table merging and file redundancies done in bash. I edited `Tranbspi//bin/custom_uniprot_hits.R` to perform these tasks and export the `csv` file with the results.  
+9. Process `summary_custom_uniprot` fails because of weird table merging and file redundancies done in bash. I edited `Tranbspi/bin/custom_uniprot_hits.R` to perform these tasks and export the `csv` file with the results.  
 
 ## Chat
 

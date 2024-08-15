@@ -397,7 +397,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::fastqc=0.11.9=0" : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/fastqc:0.11.9--0" : "quay.io/biocontainers/fastqc:0.11.9--0")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container  ? "https://depot.galaxyproject.org/singularity/fastqc:0.11.9--0" : "quay.io/biocontainers/fastqc:0.11.9--0")
                 }
 
                 input:
@@ -435,7 +435,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "bioconda::fastp=0.20.1=h8b12597_0" : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0" : "quay.io/biocontainers/fastp:0.20.1--h8b12597_0")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0" : "quay.io/biocontainers/fastp:0.20.1--h8b12597_0")
                 }
 
                 input:
@@ -469,7 +469,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "conda-forge::jq=1.6=h14c3975_1000 " : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/jq:1.6" : "quay.io/biocontainers/jq:1.6")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/jq:1.6" : "quay.io/biocontainers/jq:1.6")
                 }
 
                 input:
@@ -499,7 +499,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                     conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "conda-forge::pigz=2.3.4=hed695b0_1" : null)
                     if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                    container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/pigz:2.3.4" : "quay.io/biocontainers/pigz:2.3.4")
+                    container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container  ? "https://depot.galaxyproject.org/singularity/pigz:2.3.4" : "quay.io/biocontainers/pigz:2.3.4")
                     }
 
                     input:
@@ -537,7 +537,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "bioconda::sortmerna=4.2.0" : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/sortmerna:4.2.0--0" : "quay.io/biocontainers/sortmerna:4.2.0--0")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/sortmerna:4.2.0--0" : "quay.io/biocontainers/sortmerna:4.2.0--0")
                 }
 
                 input:
@@ -587,7 +587,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                     conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "conda-forge::pigz=2.3.4=hed695b0_1" : null)
                     if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                    container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/pigz:2.3.4" : "quay.io/biocontainers/pigz:2.3.4")
+                    container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/pigz:2.3.4" : "quay.io/biocontainers/pigz:2.3.4")
                     }
 
                     input:
@@ -640,7 +640,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge -c bioconda trinity=2.9.1=h8b12597_1" : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/trinity:2.9.1--h8b12597_1" : "quay.io/biocontainers/trinity:2.9.1--h8b12597_1")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/trinity:2.9.1--h8b12597_1" : "quay.io/biocontainers/trinity:2.9.1--h8b12597_1")
                 }
 
                 input:
@@ -710,7 +710,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                     conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "conda-forge::pigz=2.3.4=hed695b0_1" : null)
                     if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                    container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/pigz:2.3.4" : "quay.io/biocontainers/pigz:2.3.4")
+                    container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/pigz:2.3.4" : "quay.io/biocontainers/pigz:2.3.4")
                     }
 
                     input:
@@ -842,7 +842,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::trinity=2.9.1=h8b12597_1" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/trinity:2.9.1--h8b12597_1" : "quay.io/biocontainers/trinity:2.9.1--h8b12597_1")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/trinity:2.9.1--h8b12597_1" : "quay.io/biocontainers/trinity:2.9.1--h8b12597_1")
             }
 
             input:
@@ -880,7 +880,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::soapdenovo-trans=1.04=ha92aebf_2" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/soapdenovo-trans:1.04--ha92aebf_2" : "quay.io/biocontainers/soapdenovo-trans:1.04--ha92aebf_2")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/soapdenovo-trans:1.04--ha92aebf_2" : "quay.io/biocontainers/soapdenovo-trans:1.04--ha92aebf_2")
             }
 
             input:
@@ -939,7 +939,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge -c bioconda velvet=1.2.10 oases=0.2.09" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-8ce10492777ba3fb1db6e6e13fa9b78ac116db2f:f54a9246f1216443f2e0f6de9ec5908ca882f710-0" : "quay.io/biocontainers/mulled-v2-8ce10492777ba3fb1db6e6e13fa9b78ac116db2f:f54a9246f1216443f2e0f6de9ec5908ca882f710-0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-8ce10492777ba3fb1db6e6e13fa9b78ac116db2f:f54a9246f1216443f2e0f6de9ec5908ca882f710-0" : "quay.io/biocontainers/mulled-v2-8ce10492777ba3fb1db6e6e13fa9b78ac116db2f:f54a9246f1216443f2e0f6de9ec5908ca882f710-0")
             }
 
             input:
@@ -1011,7 +1011,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::spades=3.15.3=h95f258a_1" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/spades:3.15.3--h95f258a_1" : "quay.io/biocontainers/spades:3.15.3--h95f258a_1")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/spades:3.15.3--h95f258a_1" : "quay.io/biocontainers/spades:3.15.3--h95f258a_1")
             }
 
             input:
@@ -1065,7 +1065,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::transabyss=2.0.1=pyh864c0ab_7" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/transabyss:2.0.1--pyh864c0ab_7" : "quay.io/biocontainers/transabyss:2.0.1--pyh864c0ab_7")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/transabyss:2.0.1--pyh864c0ab_7" : "quay.io/biocontainers/transabyss:2.0.1--pyh864c0ab_7")
             }
 
             input:
@@ -1132,7 +1132,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::cd-hit=4.8.1 bioconda::exonerate=2.4 bioconda::blast=2.11.0" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-962eae98c9ff8d5b31e1df7e41a355a99e1152c4:0ed9db56fd54cfea67041f80bdd8b8fac575112f-0" : "quay.io/biocontainers/mulled-v2-962eae98c9ff8d5b31e1df7e41a355a99e1152c4:0ed9db56fd54cfea67041f80bdd8b8fac575112f-0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-962eae98c9ff8d5b31e1df7e41a355a99e1152c4:0ed9db56fd54cfea67041f80bdd8b8fac575112f-0" : "quay.io/biocontainers/mulled-v2-962eae98c9ff8d5b31e1df7e41a355a99e1152c4:0ed9db56fd54cfea67041f80bdd8b8fac575112f-0")
             }
 
             input:
@@ -1212,6 +1212,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
         process rna_quast {
 
             label 'med_mem'
+            shell '/bin/bash', '+o', 'pipefail'
 
             tag "${sample_id}"
 
@@ -1220,7 +1221,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::rnaquast=2.2.1=h9ee0642_0" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/rnaquast:2.2.1--h9ee0642_0" : "quay.io/biocontainers/rnaquast:2.2.1--h9ee0642_0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/rnaquast:2.2.1--h9ee0642_0" : "quay.io/biocontainers/rnaquast:2.2.1--h9ee0642_0")
             }
 
             input:
@@ -1241,7 +1242,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 echo -e "\\n-- Adding metrics to rnaQUAST results file --\\n"
                 cat ${sample_id}.rna_quast/*_output/basic_metrics.txt | grep -v "METRICS" |  sed 's/\\(\\ \\)* \\([0-9]\\)/,\\2/g' | sed 's/>,/>/g' | grep [0-9] >>${sample_id}_rnaQUAST.csv
                 echo -e "\\n-- Adding Genes to rnaQUAST results file --\\n"
-                cat ${sample_id}.rna_quast/*_output/basic_metrics.txt | grep "Genes" | sed 's/\\(\\ \\)* \\([0-9]\\)/,\\2/g' >>${sample_id}_rnaQUAST.csv
+                cat ${sample_id}.rna_quast/*_output/basic_metrics.txt | grep "Genes" | sed 's/\\(\\ \\)* \\([0-9]\\)/,\\2/g' >> ${sample_id}_rnaQUAST.csv
                 # v=\$( rnaQUAST.py | grep "QUALITY ASSESSMENT" | head -n1 | awk -F " v." '{print \$2}' )
                 echo -e "\\n-- Writing rnaQUAST version --\\n"
                 echo "rnaQUAST: \$( rnaQUAST.py | grep "QUALITY ASSESSMENT" | head -n1 | awk -F " v." '{print \$2}' )" > rnaquast.version.txt
@@ -1278,7 +1279,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::bowtie2=2.4.2=py36hff7a194_2 bioconda::samtools=1.11=h6270b1f_0" : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-c742dccc9d8fabfcff2af0d8d6799dbc711366cf:b42a120d4ad2b0f6626127964d8bcc9ada05ed03-0" : "quay.io/biocontainers/mulled-v2-c742dccc9d8fabfcff2af0d8d6799dbc711366cf:b42a120d4ad2b0f6626127964d8bcc9ada05ed03-0")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-c742dccc9d8fabfcff2af0d8d6799dbc711366cf:b42a120d4ad2b0f6626127964d8bcc9ada05ed03-0" : "quay.io/biocontainers/mulled-v2-c742dccc9d8fabfcff2af0d8d6799dbc711366cf:b42a120d4ad2b0f6626127964d8bcc9ada05ed03-0")
                 }
 
                 input:
@@ -1325,7 +1326,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
             // change container in oneContainer option
             conda (params.condaActivate && params.myConda ? params.cenv : params.condaActivate ? "-c conda-forge bioconda::busco=4.1.4=py_2" : null)
             if (params.oneContainer){ container "${params.v4container}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/busco:4.1.4--py_2" : "quay.io/biocontainers/busco:4.1.4--py_2")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/busco:4.1.4--py_2" : "quay.io/biocontainers/busco:4.1.4--py_2")
             }
 
             input:
@@ -1371,7 +1372,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::bowtie2=2.4.2=py36hff7a194_2 bioconda::samtools=1.11=h6270b1f_0" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-c742dccc9d8fabfcff2af0d8d6799dbc711366cf:b42a120d4ad2b0f6626127964d8bcc9ada05ed03-0" : "quay.io/biocontainers/mulled-v2-c742dccc9d8fabfcff2af0d8d6799dbc711366cf:b42a120d4ad2b0f6626127964d8bcc9ada05ed03-0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-c742dccc9d8fabfcff2af0d8d6799dbc711366cf:b42a120d4ad2b0f6626127964d8bcc9ada05ed03-0" : "quay.io/biocontainers/mulled-v2-c742dccc9d8fabfcff2af0d8d6799dbc711366cf:b42a120d4ad2b0f6626127964d8bcc9ada05ed03-0")
             }
 
             input:
@@ -1496,7 +1497,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 // change container in oneContainer option
                 conda (params.condaActivate && params.myConda ? params.cenv : params.condaActivate ? "-c conda-forge bioconda::busco=4.1.4=py_2" : null)
                 if (params.oneContainer){ container "${params.v4container}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/busco:4.1.4--py_2" : "ezlabgva/busco:v4.0.5_cv1")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/busco:4.1.4--py_2" : "ezlabgva/busco:v4.0.5_cv1")
                 }
 
                 input:
@@ -1558,7 +1559,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 // change container in oneContainer option
                 conda (params.condaActivate && params.myConda ? params.cenv : params.condaActivate ? "-c conda-forge bioconda::busco=4.1.4=py_2" : null)
                 if (params.oneContainer){ container "${params.v4container}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/busco:4.1.4--py_2" : "ezlabgva/busco:v4.0.5_cv1")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/busco:4.1.4--py_2" : "ezlabgva/busco:v4.0.5_cv1")
                 }
 
                 input:
@@ -1599,7 +1600,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge -c bioconda biopython=1.78 pandas=1.1.2 numpy=1.18.1" : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0" : "quay.io/biocontainers/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0" : "quay.io/biocontainers/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0")
                 }
 
                 input:
@@ -1680,7 +1681,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge -c bioconda r-reshape2=1.4.4 r-plotly=4.9.2.1 plotly-orca=3.4.2 r-ggplot2=3.3.0 r-svglite=1.2.3 r-ggthemes=4.2.0 r-knitr=1.29 r-rmarkdown=2.3 r-kableextra=1.1.0" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0" : "quay.io/biocontainers/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0" : "quay.io/biocontainers/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0")
             }
 
             input:
@@ -1737,7 +1738,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::transdecoder=5.5.0=pl526_2" : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/transdecoder:5.5.0--pl526_2" : "quay.io/biocontainers/transdecoder:5.5.0--pl526_2")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/transdecoder:5.5.0--pl526_2" : "quay.io/biocontainers/transdecoder:5.5.0--pl526_2")
                 }
 
                 input:
@@ -1811,7 +1812,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::transdecoder=5.5.0=pl526_2" : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/transdecoder:5.5.0--pl526_2" : "quay.io/biocontainers/transdecoder:5.5.0--pl526_2")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/transdecoder:5.5.0--pl526_2" : "quay.io/biocontainers/transdecoder:5.5.0--pl526_2")
                 }
 
                 input:
@@ -1848,7 +1849,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
                 if (params.oneContainer){ container "${params.diamondcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
                 }
                
                 input:
@@ -1881,7 +1882,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::hmmer=3.3=he1b5a44_0" : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/hmmer:3.3--he1b5a44_0" : "quay.io/biocontainers/hmmer:3.3--he1b5a44_0")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/hmmer:3.3--he1b5a44_0" : "quay.io/biocontainers/hmmer:3.3--he1b5a44_0")
                 }
 
                 input:
@@ -1933,7 +1934,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::transdecoder=5.5.0=pl526_2" : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/transdecoder:5.5.0--pl526_2" : "quay.io/biocontainers/transdecoder:5.5.0--pl526_2")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/transdecoder:5.5.0--pl526_2" : "quay.io/biocontainers/transdecoder:5.5.0--pl526_2")
                 }
 
                 input:
@@ -2017,7 +2018,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
             if (params.oneContainer){ container "${params.diamondcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
             }
 
             input:
@@ -2068,7 +2069,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
             if (params.oneContainer){ container "${params.diamondcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
             }
 
             input:
@@ -2105,7 +2106,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::hmmer=3.3=he1b5a44_0" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/hmmer:3.3--he1b5a44_0" : "quay.io/biocontainers/hmmer:3.3--he1b5a44_0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/hmmer:3.3--he1b5a44_0" : "quay.io/biocontainers/hmmer:3.3--he1b5a44_0")
             }
 
             input:
@@ -2242,7 +2243,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                 conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::trinotate=3.2.2=pl5262hdfd78af_0" : null)
                 if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/trinotate:3.2.2--pl5262hdfd78af_0" : "quay.io/biocontainers/trinotate:3.2.2--pl5262hdfd78af_0")
+                container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/trinotate:3.2.2--pl5262hdfd78af_0" : "quay.io/biocontainers/trinotate:3.2.2--pl5262hdfd78af_0")
                 }
 
                 label 'low_cpus'
@@ -2310,7 +2311,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::trinotate=3.2.2=pl5262hdfd78af_0" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/trinotate:3.2.2--pl5262hdfd78af_0" : "quay.io/biocontainers/trinotate:3.2.2--pl5262hdfd78af_0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/trinotate:3.2.2--pl5262hdfd78af_0" : "quay.io/biocontainers/trinotate:3.2.2--pl5262hdfd78af_0")
             }
 
             input:
@@ -2463,7 +2464,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge -c bioconda r-reshape2=1.4.4 r-plotly=4.9.2.1 plotly-orca=3.4.2 r-ggplot2=3.3.0 r-svglite=1.2.3 r-ggthemes=4.2.0 r-knitr=1.29 r-rmarkdown=2.3 r-kableextra=1.1.0" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0" : "quay.io/biocontainers/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0" : "quay.io/biocontainers/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0")
             }
 
             input:
@@ -2517,7 +2518,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge -c bioconda r-reshape2=1.4.4 r-plotly=4.9.2.1 plotly-orca=3.4.2 r-ggplot2=3.3.0 r-svglite=1.2.3 r-ggthemes=4.2.0 r-knitr=1.29 r-rmarkdown=2.3 r-kableextra=1.1.0" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0" : "quay.io/biocontainers/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0" : "quay.io/biocontainers/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0")
             }
 
             input:
@@ -2615,7 +2616,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge -c bioconda biopython=1.78 pandas=1.1.2 numpy=1.18.1" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0" : "quay.io/biocontainers/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0" : "quay.io/biocontainers/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0")
             }
 
             input:
@@ -2790,7 +2791,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                     conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
                     if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                    container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
+                    container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
                     }
 
                 	input:
@@ -2813,7 +2814,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                     conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge bioconda::diamond=0.9.30=h56fc30b_0" : null)
                     if (params.oneContainer){ container "${params.diamondcontainer}" } else {
-                    container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
+                    container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/diamond:0.9.30--h56fc30b_0" : "quay.io/biocontainers/diamond:0.9.30--h56fc30b_0")
                     }
 
                 	input:
@@ -2840,7 +2841,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
                     conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge -c bioconda biopython=1.78 pandas=1.1.2 numpy=1.18.1" : null)
                     if (params.oneContainer){ container "${params.TPcontainer}" } else {
-                    container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0" : "quay.io/biocontainers/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0")
+                    container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0" : "quay.io/biocontainers/mulled-v2-1e9d4f78feac0eb2c8d8246367973b3f6358defc:41ffac721ff9b03ca1121742e969d0e7d78e589f-0")
                     }
 
                 	input:
@@ -2915,7 +2916,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
 
             conda (params.condaActivate && params.myConda ? params.localConda : params.condaActivate ? "-c conda-forge -c bioconda r-reshape2=1.4.4 r-plotly=4.9.2.1 plotly-orca=3.4.2 r-ggplot2=3.3.0 r-svglite=1.2.3 r-ggthemes=4.2.0 r-knitr=1.29 r-rmarkdown=2.3 r-kableextra=1.1.0" : null)
             if (params.oneContainer){ container "${params.TPcontainer}" } else {
-            container (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0" : "quay.io/biocontainers/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0")
+            container ((workflow.containerEngine == 'singularity' || workflow.containerEngine == 'apptainer') && !params.singularity_pull_docker_container ? "https://depot.galaxyproject.org/singularity/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0" : "quay.io/biocontainers/mulled-v2-3f431f5f8e54df68ea0029c209fce3b154f6e186:94cad00b5306639ceab6aaf211f45740560abb90-0")
             }
 
             input:
