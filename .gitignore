@@ -10,7 +10,6 @@ work/
 cbs-dtu-tools/
 diamonddb_custom/
 diamonddb_swiss/
-nextflow.config
 results/
 sqlite_db/
 .varfile.sh
