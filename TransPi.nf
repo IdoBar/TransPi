@@ -2445,7 +2445,7 @@ if (params.onlyAsm || params.onlyAnn || params.onlyEvi || params.all) {
                 echo -e "\\n-- Done with the PFAM --\\n"
 
                 echo -e "\\n-- DONE with Trinotate --\\n"
-                mv Trino
+
                 # v=\$( echo 3.2.1 )
                 echo "Trinotate: 3.2.1" >trinotate.version.txt
 
